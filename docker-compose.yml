@@ -1,0 +1,37 @@
+services:
+backend:
+  build:
+    context: ./backend
+  container_name: backend
+  ports:
+    - "8080:8080"
+  depends_on:
+    - db
+  environment:
+    SPRING_DATASOURCE_URL: jdbc:mariadb://db:3306/moodiary_db
+    SPRING_DATASOURCE_USERNAME: moodiary
+    SPRING_DATASOURCE_PASSWORD: moodiary
+
+frontend:
+  build:
+    context: ./frontend
+  container_name: frontend
+  ports:
+    - "3000:80"
+  depends_on:
+    - backend
+
+db:
+  image: mariadb:10.11
+  container_name: mariadb
+  restart: always
+  ports:
+    - "3306:3306"
+  environment:
+    MARIADB_ROOT_PASSWORD: 1234
+    MARIADB_DATABASE: moodiary
+  volumes:
+    - db_data:/var/lib/mysql
+
+volumes:
+  db_data:
