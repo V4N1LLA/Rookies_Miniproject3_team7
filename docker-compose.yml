@@ -16,6 +16,19 @@ services:
     networks:
       - app-network
 
+  backend:
+      build:
+        context: ./backend
+      container_name: moodiary_backend
+      ports:
+        - "8080:8080"
+      depends_on:
+        - mariadb
+      environment:
+        SPRING_DATASOURCE_URL: jdbc:mariadb://mariadb:3306/moodiary_db
+        SPRING_DATASOURCE_USERNAME: moodiary
+        SPRING_DATASOURCE_PASSWORD: moodiary
+
 volumes:
   db_data:
 
