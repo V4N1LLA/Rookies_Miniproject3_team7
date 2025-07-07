@@ -1,0 +1,4 @@
+﻿#필요한 라이브러리 명시
+fastapi
+uvicorn
+pydantic
