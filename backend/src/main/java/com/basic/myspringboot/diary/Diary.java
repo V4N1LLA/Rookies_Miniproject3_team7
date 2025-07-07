@@ -1,5 +1,6 @@
 package com.basic.myspringboot.diary;
 
+import com.basic.myspringboot.analysis.EmotionAnalysisResult;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -18,7 +19,7 @@ public class Diary {
     private Long diaryId;
 
     @Column(nullable = false)
-    private Long userId;  // JWT에서 가져올 예정
+    private Long userId;  // JWT에서 추출 예정
 
     @Column(nullable = false)
     private String title;
@@ -27,5 +28,17 @@ public class Diary {
     private String content;
 
     @Column(nullable = false)
-    private LocalDateTime timestamp = LocalDateTime.now();
+    private LocalDateTime timestamp;
+
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "analysis_id")
+    private EmotionAnalysisResult analysisResult;
+
+    @PrePersist
+    protected void onCreate() {
+        if (this.timestamp == null) {
+            this.timestamp = LocalDateTime.now();
+        }
+    }
 }
+

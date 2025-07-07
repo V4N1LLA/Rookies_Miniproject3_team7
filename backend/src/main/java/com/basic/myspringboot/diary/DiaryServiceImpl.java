@@ -1,10 +1,10 @@
 package com.basic.myspringboot.diary;
 
+import com.basic.myspringboot.analysis.EmotionAnalysisResult;
+import com.basic.myspringboot.analysis.EmotionAnalysisService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -12,16 +12,18 @@ import java.util.List;
 public class DiaryServiceImpl implements DiaryService {
 
     private final DiaryRepository diaryRepository;
+    private final EmotionAnalysisService emotionAnalysisService;
 
     @Override
     public Diary createDiary(DiaryRequestDto dto) {
-        LocalDateTime parsedTime = LocalDateTime.parse(dto.getTimestamp(), DateTimeFormatter.ISO_DATE_TIME);
+        EmotionAnalysisResult analysisResult = emotionAnalysisService.analyzeAndSave(dto.getContent());
 
         Diary diary = Diary.builder()
-                .userId(1L)  // JWT 기반으로 추후 대체 예정
+                .userId(1L)  // 추후 JWT에서 대체
                 .title(dto.getTitle())
                 .content(dto.getContent())
-                .timestamp(parsedTime)
+                .timestamp(dto.getTimestamp())
+                .analysisResult(analysisResult)
                 .build();
 
         return diaryRepository.save(diary);
@@ -29,7 +31,7 @@ public class DiaryServiceImpl implements DiaryService {
 
     @Override
     public List<Diary> getAllDiaries() {
-        return diaryRepository.findAll();
+        return diaryRepository.findAllWithAnalysis(); // 🔥 fetch join
     }
 
     @Override

@@ -1,7 +1,6 @@
 package com.basic.myspringboot.analysis;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -9,16 +8,10 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class AnalysisTestController {
 
-    private final EmotionClient emotionClient;
+    private final EmotionAnalysisService analysisService;
 
     @PostMapping("/test")
-    public ResponseEntity<?> testAnalysis(@RequestBody EmotionRequest request) {
-        // **방어 로직 추가**
-        if (request == null || request.getContent() == null || request.getContent().isBlank()) {
-            return ResponseEntity.badRequest().body("내용이 없습니다.");
-        }
-
-        EmotionAnalysisResponse response = emotionClient.requestAnalysis(request.getContent());
-        return ResponseEntity.ok(response);
+    public EmotionAnalysisResult testAnalysis(@RequestBody EmotionAnalysisRequest request) {
+        return analysisService.analyzeAndSave(request.getContent());
     }
 }

@@ -1,24 +1,27 @@
 package com.basic.myspringboot.analysis;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import lombok.Getter;
+import lombok.*;
 
 @Entity
-@Getter
+@Table(name = "emotion_scores")
+@Getter @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class EmotionScore {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "emotion_id", nullable = false)
-    private EmotionEnum emotion;
+    private String emotion;
 
-    @ManyToOne
+    private Float score;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "analysis_id", nullable = false)
-    private AnalysisVector analysis;
-
-    @Column(nullable = false)
-    private float score;
+    @JsonBackReference
+    private EmotionAnalysisResult analysisResult;
 }

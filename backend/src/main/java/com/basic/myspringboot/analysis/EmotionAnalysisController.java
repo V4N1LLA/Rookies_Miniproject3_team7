@@ -16,7 +16,7 @@ public class EmotionAnalysisController {
 
     @PostMapping
     public Map<String, Object> analyze(@RequestBody EmotionAnalysisRequest request) {
-        EmotionAnalysisResponse result = analysisService.analyze(request);
+        EmotionAnalysisResult result = analysisService.analyzeAndSave(request.getContent());
 
         Map<String, Object> response = new HashMap<>();
         response.put("success", true);

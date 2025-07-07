@@ -1,8 +1,19 @@
 HELP.md
-target/
+backend/target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
+
+# Ignore environment config
+.env
+application-local.yml
+
+# Java / Spring Boot
+/target
+*.class
+*.jar
+*.war
+*.log
 
 ### STS ###
 .apt_generated
@@ -31,3 +42,7 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# OS
+.DS_Store
+Thumbs.db
