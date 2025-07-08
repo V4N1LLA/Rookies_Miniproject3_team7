@@ -55,7 +55,13 @@ function DiaryDetail() {
               다이어리 없음
             </h2>
             <div className="mb-4 text-gray-700 font-['SejongGeulggot']">
-              {diary?.timestamp?.slice(0, 10)}
+              {diary?.timestamp &&
+                new Date(diary.timestamp).toLocaleDateString("ko-KR", {
+                  year: "numeric",
+                  month: "2-digit",
+                  day: "2-digit",
+                  weekday: "long",
+                })}
             </div>
             <p className="text-gray-500 mb-4 font-['SejongGeulggot']">
               해당 날짜에 작성된 다이어리가 없습니다.
@@ -86,7 +92,13 @@ function DiaryDetail() {
           </div>
 
           <div className="mb-4 font-['SejongGeulggot'] text-[20px] text-gray-700">
-            {diary?.timestamp?.slice(0, 10)}
+            {diary?.timestamp &&
+              new Date(diary.timestamp).toLocaleDateString("ko-KR", {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+                weekday: "long",
+              })}
           </div>
 
           <div className="mb-6">
