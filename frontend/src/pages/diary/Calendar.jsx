@@ -2,6 +2,8 @@ import React from "react";
 import { useCalendarStore } from "../../store/calendarStore";
 import { useNavigate } from "react-router-dom";
 import "../../index.css";
+import { useEffect, useState } from "react";
+import { fetchDiaries } from "../../services/diary";
 import { ChevronRightIcon } from "@heroicons/react/24/solid";
 import { ChevronLeftIcon } from "@heroicons/react/24/solid";
 
@@ -19,6 +21,19 @@ function isFutureDate(year, month, day) {
 function Calendar() {
   const { year, month, setYear, setMonth } = useCalendarStore();
   const navigate = useNavigate();
+  const [diaryDates, setDiaryDates] = useState([]);
+
+  useEffect(() => {
+    fetchDiaries()
+      .then((entries) => {
+        const dates = entries.map((entry) => ({
+          date: entry.timestamp.slice(0, 10),
+          id: entry.diaryId,
+        }));
+        setDiaryDates(dates);
+      })
+      .catch((err) => console.error("다이어리 로딩 실패:", err));
+  }, []);
 
   const changeMonth = (increment) => {
     const newMonth = month + increment;
@@ -38,7 +53,12 @@ function Calendar() {
     const dateStr = `${year}-${String(month).padStart(2, "0")}-${String(
       day
     ).padStart(2, "0")}`;
-    navigate(`/diary/DiaryWrite?date=${dateStr}`);
+    const diaryEntry = diaryDates.find((d) => d.date === dateStr);
+    if (diaryEntry) {
+      navigate(`/diary/DiaryDetail/${diaryEntry.id}`);
+    } else {
+      navigate(`/diary/DiaryWrite?date=${dateStr}`);
+    }
   };
 
   const daysInMonth = getDaysInMonth(year, month);
@@ -83,19 +103,36 @@ function Calendar() {
                 {d}
               </div>
             ))}
-            {days.map((day, idx) => (
-              <div
-                key={idx}
-                className={`w-[52px] h-[52px] flex items-center justify-center rounded-full cursor-pointer ${
-                  day && !isFutureDate(year, month, day)
-                    ? "hover:rounded-full hover:ring-2 hover:ring-gray-700"
-                    : ""
-                }`}
-                onClick={() => handleDayClick(day)}
-              >
-                {day || ""}
-              </div>
-            ))}
+            {days.map((day, idx) => {
+              const dateStr = day
+                ? `${year}-${String(month).padStart(2, "0")}-${String(
+                    day
+                  ).padStart(2, "0")}`
+                : null;
+              const diaryEntry = dateStr && diaryDates.find((d) => d.date === dateStr);
+              const hasDiary = !!diaryEntry;
+
+              return (
+                <div
+                  key={idx}
+                  className={`w-[52px] h-[52px] flex items-center justify-center rounded-full cursor-pointer
+        ${
+          day && !isFutureDate(year, month, day)
+            ? "hover:rounded-full hover:ring-2 hover:ring-gray-700"
+            : ""
+        }
+      `}
+                  onClick={() => handleDayClick(day)}
+                >
+                  <div className="relative">
+                    <span>{day || ""}</span>
+                    {hasDiary && (
+                      <span className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-yellow-400 rounded-full" />
+                    )}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>{" "}

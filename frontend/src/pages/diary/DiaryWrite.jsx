@@ -1,13 +1,49 @@
 import React from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import "../../index.css"; // bg-paper가 정의되어 있는 CSS
+import axios from "axios";
+
+const API_BASE_URL = "http://localhost:8080/api/diaries";
+
+export const createDiary = async (diary) => {
+  try {
+    const response = await axios.post(API_BASE_URL, diary);
+    return response.data.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
 
 function DiaryWrite() {
   const location = useLocation();
+  const navigate = useNavigate();
   const params = new URLSearchParams(location.search);
   const date = params.get("date");
   const [year, month, day] = date ? date.split("-") : [];
   const [selectedWeather, setSelectedWeather] = React.useState(null);
+  const [title, setTitle] = React.useState("");
+  const [content, setContent] = React.useState("");
+  const handleBack = () => {
+    navigate("/diary");
+  };
+  const handleSubmit = async () => {
+    if (!title || !content) {
+      alert("제목, 내용을 모두 입력해주세요.");
+      return;
+    }
+
+    try {
+      await createDiary({
+        timestamp: `${date}T00:00:00`, // ISO 포맷에 맞게 조정
+        title: title,
+        content: content,
+      });
+      alert("일기가 등록되었습니다!");
+    } catch (err) {
+      console.error("일기 등록 실패:", err);
+      alert("일기 등록에 실패했습니다.");
+    }
+  };
 
   return (
     <div className="min-h-screen flex justify-center items-center py-12 px-4">
@@ -33,17 +69,35 @@ function DiaryWrite() {
             ))}
           </div>
         </div>
+        {/* 제목 입력 */}
+        <input
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="제목을 입력하세요"
+          className="w-full mb-4 border border-gray-300 text-[#222222] rounded-lg px-6 py-3 font-['SejongGeulggot'] text-[20px] bg-white/80 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-600"
+        />
 
         {/* 일기 입력 */}
         <textarea
           rows="10"
-          className="w-full border focus:outline-none focus:ring-2 focus:ring-gray-600 border-gray-300 text-[#222222] rounded-lg p-6 font-['SejongGeulggot'] text-[25px] leading-relaxed bg-white/50 bg-[repeating-linear-gradient(to_bottom,transparent,transparent_35px,#ccc_35px,#ccc_36px)]"
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          className="w-full border focus:outline-none focus:ring-2 focus:ring-gray-600 border-gray-300 text-[#222222] rounded-lg p-6 font-['SejongGeulggot'] text-[20px] leading-relaxed bg-white/50 bg-[repeating-linear-gradient(to_bottom,transparent,transparent_35px,#ccc_35px,#ccc_36px)]"
           placeholder="오늘의 이야기를 적어보세요..."
         />
-
-        {/* 제출 버튼 */}
-        <div className="text-center mt-6 font-['SejongGeulggot']">
-          <button className="bg-[#F5C451] text-white font-semibold px-6 py-2 rounded-lg hover:bg-yellow-400 shadow-[0_4px_4px_3px_rgba(0,0,0,0.25)]">
+        
+        <div className="flex justify-center gap-6 mt-6">
+          <button
+            onClick={handleBack}
+            className="w-[200px] bg-gray-500 text-white px-6 py-3 rounded font-['SejongGeulggot'] text-[18px] shadow-[0_4px_4px_3px_rgba(0,0,0,0.25)]"
+          >
+            돌아가기
+          </button>
+          <button
+            onClick={handleSubmit}
+            className="w-[200px] bg-[#F5C451] text-white font-semibold px-6 py-3 rounded font-['SejongGeulggot'] text-[18px] hover:bg-yellow-400 shadow-[0_4px_4px_3px_rgba(0,0,0,0.25)]"
+          >
             오늘의 일기 끝.
           </button>
         </div>
