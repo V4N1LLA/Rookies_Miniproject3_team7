@@ -2,7 +2,12 @@
 module.exports = {
   content: ["./src/**/*.{js,jsx,ts,tsx}"],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        erica: ['"Erica One"', "cursive"],
+        noto: ['"Noto Sans KR"', "sans-serif"],
+      },
+    },
   },
   plugins: [],
 };
