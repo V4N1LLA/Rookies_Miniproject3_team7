@@ -16,7 +16,7 @@ function EmotionBubble({ emotion }) {
 
   const { color, emoji } = emotionMap[emotion] || {
     color: "#CCCCCC",
-    emoji: "Unknown",
+    emoji: "🫥",
   };
 
   return (

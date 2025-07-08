@@ -38,7 +38,9 @@ function DiaryWrite() {
         title: title,
         content: content,
       });
+
       alert("일기가 등록되었습니다!");
+      navigate("/diary");
     } catch (err) {
       console.error("일기 등록 실패:", err);
       alert("일기 등록에 실패했습니다.");
@@ -86,7 +88,7 @@ function DiaryWrite() {
           className="w-full border focus:outline-none focus:ring-2 focus:ring-gray-600 border-gray-300 text-[#222222] rounded-lg p-6 font-['SejongGeulggot'] text-[20px] leading-relaxed bg-white/50 bg-[repeating-linear-gradient(to_bottom,transparent,transparent_35px,#ccc_35px,#ccc_36px)]"
           placeholder="오늘의 이야기를 적어보세요..."
         />
-        
+
         <div className="flex justify-center gap-6 mt-6">
           <button
             onClick={handleBack}
