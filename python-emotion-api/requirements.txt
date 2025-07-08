@@ -2,3 +2,6 @@
 fastapi
 uvicorn
 pydantic
+transformers
+torch
+python-dotenv

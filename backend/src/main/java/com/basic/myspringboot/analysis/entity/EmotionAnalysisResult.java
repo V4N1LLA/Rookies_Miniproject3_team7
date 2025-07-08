@@ -1,8 +1,8 @@
-package com.basic.myspringboot.analysis;
+package com.basic.myspringboot.analysis.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -13,15 +13,26 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Table(name = "emotion_analysis_result")
 public class EmotionAnalysisResult {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "analysis_id")
     private Long analysisId;
 
+    @Column(name = "domain_emotion", nullable = false)
     private String domainEmotion;
+
     private int dim;
+
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
+
+    @PrePersist
+    public void setCreatedAt() {
+        this.createdAt = LocalDateTime.now();
+    }
 
     @OneToMany(mappedBy = "analysisResult", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference

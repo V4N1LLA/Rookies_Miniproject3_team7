@@ -1,10 +1,13 @@
-package com.basic.myspringboot.analysis;
+package com.basic.myspringboot.analysis.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.Setter;
 
 @Entity
+@Table(name = "emotion_enum")
 @Getter
+@Setter
 public class EmotionEnum {
 
     @Id

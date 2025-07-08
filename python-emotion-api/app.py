@@ -1,39 +1,48 @@
 # python-emotion-api/app.py
-from fastapi import FastAPI
+
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from typing import List
+from typing import List, Dict
 from datetime import datetime
+from dotenv import load_dotenv
+
+from analysis.emotion_analyzer import analyze_emotion
+from analysis.message_generator import generate_message
+
+load_dotenv()
 
 app = FastAPI()
+
 
 # 요청 형식
 class EmotionRequest(BaseModel):
     content: str
 
+
 # 응답 형식
 class EmotionResponse(BaseModel):
-    domainEmotion: str
-    scores: dict
+    domain_emotion: str
+    scores: Dict[str, float]
     vector: List[float]
     dim: int
-    createdAt: datetime
+    encouragement_message: str
+    created_at: datetime
+
 
 @app.post("/analyze", response_model=EmotionResponse)
-def analyze_emotion(request: EmotionRequest):
-    content = request.content
+def analyze(request: EmotionRequest):
+    try:
+        emotion_result = analyze_emotion(request.content)
+        message = generate_message(request.content, emotion_result["top_emotion"])
 
-    # 실제 분석 모델은 추후 교체
-    dummy_scores = {
-        "SAD": 4.8,
-        "FATIGUE": 2.1,
-        "LONELY": 1.9
-    }
-    dummy_vector = [0.1, 0.2, -0.1, 0.05, 0.3]  # 예시
+        return EmotionResponse(
+            domain_emotion=emotion_result["top_emotion"],
+            scores=emotion_result["scores"],
+            vector=emotion_result["vector"],
+            dim=emotion_result["dim"],
+            encouragement_message=message,
+            created_at=datetime.utcnow()
+        )
 
-    return {
-        "domainEmotion": "SAD",
-        "scores": dummy_scores,
-        "vector": dummy_vector,
-        "dim": len(dummy_vector),
-        "createdAt": datetime.utcnow()
-    }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

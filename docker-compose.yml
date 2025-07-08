@@ -1,7 +1,10 @@
+version: '3.8'
+
 services:
   backend:
     build:
       context: ./backend
+      dockerfile: Dockerfile
     container_name: backend
     ports:
       - "8080:8080"
@@ -9,7 +12,17 @@ services:
       SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
       SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
-    depends_on: []
+      EMOTION_API_URL: http://emotion-api:8000
+    depends_on:
+      - emotion-api
+      # - db (만약 DB를 활성화할 경우)
+
+  emotion-api:
+    build:
+      context: ./python-emotion-api
+    container_name: emotion-api
+    ports:
+      - "8000:8000"
 
 #  frontend:
  #   build:

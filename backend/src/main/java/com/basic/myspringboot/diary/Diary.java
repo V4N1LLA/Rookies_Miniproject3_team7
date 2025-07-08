@@ -1,6 +1,6 @@
 package com.basic.myspringboot.diary;
 
-import com.basic.myspringboot.analysis.EmotionAnalysisResult;
+import com.basic.myspringboot.analysis.entity.EmotionAnalysisResult;
 import jakarta.persistence.*;
 import lombok.*;
 

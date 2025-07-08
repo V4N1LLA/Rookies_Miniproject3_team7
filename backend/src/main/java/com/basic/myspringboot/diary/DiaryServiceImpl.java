@@ -1,7 +1,7 @@
 package com.basic.myspringboot.diary;
 
-import com.basic.myspringboot.analysis.EmotionAnalysisResult;
-import com.basic.myspringboot.analysis.EmotionAnalysisService;
+import com.basic.myspringboot.analysis.entity.EmotionAnalysisResult;
+import com.basic.myspringboot.analysis.service.EmotionAnalysisService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,14 +16,15 @@ public class DiaryServiceImpl implements DiaryService {
 
     @Override
     public Diary createDiary(DiaryRequestDto dto) {
-        EmotionAnalysisResult analysisResult = emotionAnalysisService.analyzeAndSave(dto.getContent());
+        // 감정 분석 비활성화
+        // EmotionAnalysisResult analysisResult = emotionAnalysisService.analyzeAndSave(dto.getContent());
 
         Diary diary = Diary.builder()
                 .userId(1L)  // 추후 JWT에서 대체
                 .title(dto.getTitle())
                 .content(dto.getContent())
                 .timestamp(dto.getTimestamp())
-                .analysisResult(analysisResult)
+                // .analysisResult(analysisResult)  // **감정 분석 제외**
                 .build();
 
         return diaryRepository.save(diary);

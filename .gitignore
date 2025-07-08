@@ -46,3 +46,5 @@ build/
 # OS
 .DS_Store
 Thumbs.db
+
+python-emotion-api/venv/

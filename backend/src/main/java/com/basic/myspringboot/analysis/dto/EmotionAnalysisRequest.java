@@ -1,4 +1,4 @@
-package com.basic.myspringboot.analysis;
+package com.basic.myspringboot.analysis.dto;
 
 import lombok.Getter;
 import lombok.Setter;
