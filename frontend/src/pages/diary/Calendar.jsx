@@ -2,6 +2,7 @@ import React from "react";
 import { useCalendarStore } from "../../store/calendarStore";
 import { useNavigate } from "react-router-dom";
 import "../../index.css";
+import EmotionBubble from "../../components/common/emotionBubble";
 import { useEffect, useState } from "react";
 import { fetchDiaries } from "../../services/diary";
 import { ChevronRightIcon } from "@heroicons/react/24/solid";
@@ -29,6 +30,7 @@ function Calendar() {
         const dates = entries.map((entry) => ({
           date: entry.timestamp.slice(0, 10),
           id: entry.diaryId,
+          emotion: entry.analysisResult?.domainEmotion,
         }));
         setDiaryDates(dates);
       })
@@ -109,27 +111,28 @@ function Calendar() {
                     day
                   ).padStart(2, "0")}`
                 : null;
-              const diaryEntry = dateStr && diaryDates.find((d) => d.date === dateStr);
+              const diaryEntry =
+                dateStr && diaryDates.find((d) => d.date === dateStr);
               const hasDiary = !!diaryEntry;
 
               return (
                 <div
                   key={idx}
-                  className={`w-[52px] h-[52px] flex items-center justify-center rounded-full cursor-pointer
+                  className={`w-[52px] h-[52px] flex items-center justify-center rounded-full cursor-pointer relative
         ${
           day && !isFutureDate(year, month, day)
-            ? "hover:rounded-full hover:ring-2 hover:ring-gray-700"
+            ? "hover:ring-2 hover:ring-yellow-400"
             : ""
         }
       `}
                   onClick={() => handleDayClick(day)}
                 >
-                  <div className="relative">
-                    <span>{day || ""}</span>
-                    {hasDiary && (
-                      <span className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-yellow-400 rounded-full" />
-                    )}
-                  </div>
+                 <div className="relative w-full h-full flex items-center justify-center">
+                   {hasDiary && (
+                     <EmotionBubble emotion={diaryEntry.emotion?.toLowerCase()} />
+                   )}
+                   <span className="absolute z-10">{day || ""}</span>
+                 </div>
                 </div>
               );
             })}
