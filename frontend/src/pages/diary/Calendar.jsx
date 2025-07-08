@@ -127,12 +127,16 @@ function Calendar() {
       `}
                   onClick={() => handleDayClick(day)}
                 >
-                 <div className="relative w-full h-full flex items-center justify-center">
-                   {hasDiary && (
-                     <EmotionBubble emotion={diaryEntry.emotion?.toLowerCase()} />
-                   )}
-                   <span className="absolute z-10">{day || ""}</span>
-                 </div>
+                  <div className="relative w-full h-full flex items-center justify-center">
+                    {hasDiary && (
+                      <div className="absolute z-0 w-full h-full flex items-center justify-center">
+                        <EmotionBubble
+                          emotion={diaryEntry.emotion?.toLowerCase()}
+                        />
+                      </div>
+                    )}
+                    <span className="absolute z-10">{day || ""}</span>
+                  </div>
                 </div>
               );
             })}
