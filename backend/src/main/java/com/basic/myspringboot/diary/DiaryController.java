@@ -1,5 +1,7 @@
 package com.basic.myspringboot.diary;
 
+import com.basic.myspringboot.analysis.entity.EmotionAnalysisResult;
+import com.basic.myspringboot.analysis.service.EmotionAnalysisService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +17,7 @@ import java.util.*;
 public class DiaryController {
 
     private final DiaryService diaryService;
+    private final EmotionAnalysisService emotionAnalysisService;
 
     private Map<String, Object> buildResponse(Object data, String message, boolean success) {
         Map<String, Object> response = new LinkedHashMap<>();
@@ -49,6 +52,7 @@ public class DiaryController {
         return ResponseEntity.ok(buildResponse(diaryList, "다이어리 목록 조회 성공", true));
     }
 
+    // 기존 등록 (분석 포함)
     @PostMapping
     public ResponseEntity<Map<String, Object>> createDiary(@RequestBody DiaryRequestDto requestDto) {
         Diary diary = diaryService.createDiary(requestDto);
@@ -68,6 +72,42 @@ public class DiaryController {
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(buildResponse(data, "다이어리가 생성되었습니다.", true));
+    }
+
+    // 분석 없이 등록
+    @PostMapping("/register")
+    public ResponseEntity<Map<String, Object>> registerDiaryWithoutAnalysis(@RequestBody DiaryRequestDto requestDto) {
+        Diary diary = diaryService.createDiaryWithoutAnalysis(requestDto);
+
+        Map<String, Object> data = new LinkedHashMap<>();
+        data.put("diaryId", diary.getDiaryId());
+        data.put("title", diary.getTitle());
+        data.put("content", diary.getContent());
+        data.put("timestamp", diary.getTimestamp());
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(buildResponse(data, "감정 분석 없이 일기가 등록되었습니다.", true));
+    }
+
+    // 등록된 일기 분석
+    @PostMapping("/{id}/analyze")
+    public ResponseEntity<Map<String, Object>> analyzeDiary(@PathVariable Long id) {
+        Diary diary = diaryService.getDiaryById(id);
+
+        if (diary.getAnalysisResult() != null) {
+            return ResponseEntity.badRequest().body(buildResponse(null, "이미 분석된 일기입니다.", false));
+        }
+
+        EmotionAnalysisResult analysisResult = emotionAnalysisService.analyzeAndSave(diary.getContent());
+        diary.setAnalysisResult(analysisResult);
+        diaryService.saveDiary(diary);
+
+        Map<String, Object> data = new LinkedHashMap<>();
+        data.put("diaryId", diary.getDiaryId());
+        data.put("domainEmotion", analysisResult.getDomainEmotion());
+        data.put("dim", analysisResult.getDim());
+
+        return ResponseEntity.ok(buildResponse(data, "감정 분석이 완료되었습니다.", true));
     }
 
     @GetMapping("/{id}")

@@ -16,7 +16,6 @@ public class DiaryServiceImpl implements DiaryService {
 
     @Override
     public Diary createDiary(DiaryRequestDto dto) {
-        // 감정 분석
         EmotionAnalysisResult analysisResult = emotionAnalysisService.analyzeAndSave(dto.getContent());
 
         Diary diary = Diary.builder()
@@ -24,10 +23,27 @@ public class DiaryServiceImpl implements DiaryService {
                 .title(dto.getTitle())
                 .content(dto.getContent())
                 .timestamp(dto.getTimestamp())
-                // .analysisResult(analysisResult)  // **감정 분석 제외**
+                .analysisResult(analysisResult)
                 .build();
 
         return diaryRepository.save(diary);
+    }
+
+    @Override
+    public Diary createDiaryWithoutAnalysis(DiaryRequestDto dto) {
+        Diary diary = Diary.builder()
+                .userId(1L)  // 추후 JWT에서 대체
+                .title(dto.getTitle())
+                .content(dto.getContent())
+                .timestamp(dto.getTimestamp())
+                .build();
+
+        return diaryRepository.save(diary);
+    }
+
+    @Override
+    public void saveDiary(Diary diary) {
+        diaryRepository.save(diary);
     }
 
     @Override

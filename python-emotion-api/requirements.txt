@@ -1,7 +1,7 @@
-﻿#필요한 라이브러리 명시
-fastapi
+﻿fastapi
 uvicorn
 pydantic
 transformers
 torch
+numpy
 python-dotenv

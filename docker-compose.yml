@@ -15,7 +15,6 @@ services:
       EMOTION_API_URL: http://emotion-api:8000
     depends_on:
       - emotion-api
-      # - db (만약 DB를 활성화할 경우)
 
   emotion-api:
     build:
@@ -24,12 +23,12 @@ services:
     ports:
       - "8000:8000"
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8000/docs" ]
+      test: ["CMD", "curl", "-f", "http://localhost:8000/docs"]
       interval: 5s
       timeout: 3s
       retries: 5
 
-#  frontend:
+    #  frontend:
  #   build:
   #    context: ./frontend
    # container_name: frontend

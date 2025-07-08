@@ -1,5 +1,3 @@
-# python-emotion-api/app.py
-
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import List, Dict
@@ -10,16 +8,11 @@ from analysis.emotion_analyzer import analyze_emotion
 from analysis.message_generator import generate_message
 
 load_dotenv()
-
 app = FastAPI()
 
-
-# 요청 형식
 class EmotionRequest(BaseModel):
     content: str
 
-
-# 응답 형식
 class EmotionResponse(BaseModel):
     domain_emotion: str
     scores: Dict[str, float]
@@ -27,7 +20,6 @@ class EmotionResponse(BaseModel):
     dim: int
     encouragement_message: str
     created_at: datetime
-
 
 @app.post("/analyze", response_model=EmotionResponse)
 def analyze(request: EmotionRequest):
@@ -41,8 +33,7 @@ def analyze(request: EmotionRequest):
             vector=emotion_result["vector"],
             dim=emotion_result["dim"],
             encouragement_message=message,
-            created_at=datetime.utcnow()
+            created_at=emotion_result["created_at"]
         )
-
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
