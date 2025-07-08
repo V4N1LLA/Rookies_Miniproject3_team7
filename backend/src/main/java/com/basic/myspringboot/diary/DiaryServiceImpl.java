@@ -16,8 +16,8 @@ public class DiaryServiceImpl implements DiaryService {
 
     @Override
     public Diary createDiary(DiaryRequestDto dto) {
-        // 감정 분석 비활성화
-        // EmotionAnalysisResult analysisResult = emotionAnalysisService.analyzeAndSave(dto.getContent());
+        // 감정 분석
+        EmotionAnalysisResult analysisResult = emotionAnalysisService.analyzeAndSave(dto.getContent());
 
         Diary diary = Diary.builder()
                 .userId(1L)  // 추후 JWT에서 대체

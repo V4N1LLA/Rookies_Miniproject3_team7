@@ -1,13 +1,11 @@
 package com.basic.myspringboot.analysis.service;
 
-import com.basic.myspringboot.analysis.repository.EmotionEnumRepository;
+import com.basic.myspringboot.analysis.client.EmotionClient;
 import com.basic.myspringboot.analysis.dto.EmotionResponseDto;
-import com.basic.myspringboot.analysis.dto.EmotionRequestDto;
 import com.basic.myspringboot.analysis.entity.*;
 import com.basic.myspringboot.analysis.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,19 +20,11 @@ public class EmotionAnalysisService {
     private final AnalysisVectorRepository vectorRepository;
     private final EmotionEnumRepository emotionEnumRepository;
 
-    private final WebClient webClient = WebClient.builder()
-            .baseUrl("http://localhost:8000")  // FastAPI 서버 주소
-            .build();
+    private final EmotionClient emotionClient;
 
     public EmotionAnalysisResult analyzeAndSave(String content) {
         // 1. FastAPI로 감정 분석 요청
-        EmotionRequestDto request = new EmotionRequestDto(content);
-        EmotionResponseDto response = webClient.post()
-                .uri("/analyze")
-                .bodyValue(request)
-                .retrieve()
-                .bodyToMono(EmotionResponseDto.class)
-                .block(); // 동기 처리
+        EmotionResponseDto response = emotionClient.requestAnalysis(content);
 
         // 2. EmotionAnalysisResult 저장
         EmotionAnalysisResult result = EmotionAnalysisResult.builder()
