@@ -130,13 +130,13 @@ function Calendar() {
                 >
                   <div className="relative w-full h-full flex items-center justify-center">
                     {hasDiary && (
-                      <div className="absolute z-0 w-full h-full flex items-center justify-center">
+                      <div className="absolute z-10 w-full h-full flex items-center justify-center">
                         <EmotionBubble
                           emotion={diaryEntry.emotion?.toLowerCase()}
                         />
                       </div>
                     )}
-                    <span className="absolute z-10">{day || ""}</span>
+                    <span className="absolute z-40">{day || ""}</span>
                   </div>
                 </div>
               );
