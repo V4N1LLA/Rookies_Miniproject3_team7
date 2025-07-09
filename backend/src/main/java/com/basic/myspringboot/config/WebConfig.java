@@ -13,8 +13,8 @@ public class WebConfig {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**")  // 모든 API 경로에 대해
-                        .allowedOrigins("http://localhost:3000") // 프론트 주소
+                registry.addMapping("/**")
+                        .allowedOriginPatterns("*")  // ✅ allowedOrigins 대신 이걸로
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
                         .allowCredentials(true);
@@ -22,3 +22,5 @@ public class WebConfig {
         };
     }
 }
+
+
