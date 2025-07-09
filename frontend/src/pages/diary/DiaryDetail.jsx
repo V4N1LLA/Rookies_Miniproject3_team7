@@ -1,7 +1,7 @@
 import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { fetchDiaryById } from "../../services/diary";
+import { fetchDiaryById, deleteDiary } from "../../services/diary";
 import { getKoreanEmotion } from "../../components/common/emotionDictionary";
 
 function DiaryDetail() {
@@ -37,6 +37,19 @@ function DiaryDetail() {
 
   const handleBack = () => {
     navigate("/diary");
+  };
+
+  const handleDelete = async () => {
+    if (!window.confirm("정말 삭제하시겠습니까?")) return;
+
+    try {
+      await deleteDiary(id);
+      alert("일기가 삭제되었습니다.");
+      navigate("/diary");
+    } catch (error) {
+      console.error("일기 삭제 실패:", error);
+      alert("일기 삭제에 실패했습니다.");
+    }
   };
 
   const handleAnalysis = async () => {
@@ -163,6 +176,12 @@ function DiaryDetail() {
               className="bg-gray-500 text-white px-4 py-2 rounded font-['SejongGeulggot'] shadow-[0_4px_4px_3px_rgba(0,0,0,0.25)]"
             >
               돌아가기
+            </button>
+            <button
+              onClick={handleDelete}
+              className="bg-red-500 text-white px-4 py-2 rounded font-['SejongGeulggot'] shadow-[0_4px_4px_3px_rgba(0,0,0,0.25)]"
+            >
+              삭제하기
             </button>
             {!analysis &&
               (analyzing ? (
