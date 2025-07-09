@@ -1,21 +1,29 @@
 import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { fetchDiaryById } from "../../services/diary";
+import { getKoreanEmotion } from "../../components/common/emotionDictionary";
 
 function DiaryDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [diary, setDiary] = React.useState(null);
   const [loading, setLoading] = React.useState(true);
-  const token = localStorage.getItem("token");
+  const token =
+    "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiLsobDsnYDsp4AiLCJpYXQiOjE3NTIwNDI2MDQsImV4cCI6MTc1MjEyOTAwNH0.hX7rizanl6bw4f2rMRlotR4f7sibnGhG7n8FMQ-dHxo";
+
+  const [analysis, setAnalysis] = React.useState(null);
+  const [analyzing, setAnalyzing] = React.useState(false);
 
   React.useEffect(() => {
     const fetchDiary = async () => {
       try {
-        const res = await axios.get(`http://localhost:8080/api/diaries/${id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setDiary(res.data.data);
+        const data = await fetchDiaryById(id);
+        console.log("일기 데이터:", data);
+        setDiary(data);
+        if (data.analysisResult) {
+          setAnalysis(data.analysisResult);
+        }
       } catch (err) {
         console.error("다이어리 불러오기 실패:", err);
         setDiary(null);
@@ -31,7 +39,26 @@ function DiaryDetail() {
     navigate("/diary");
   };
 
-  const handleAnalysis = () => {};
+  const handleAnalysis = async () => {
+    setAnalyzing(true);
+    try {
+      const response = await axios.post(
+        `http://localhost:8080/api/diaries/${id}/analyze`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setAnalysis(response.data.data);
+    } catch (error) {
+      console.error("감정 분석 실패:", error);
+      alert("감정 분석에 실패했습니다.");
+    } finally {
+      setAnalyzing(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -114,6 +141,22 @@ function DiaryDetail() {
             </div>
           </div>
 
+         {analysis && (() => {
+           const emotion = getKoreanEmotion(analysis.domainEmotion);
+           return (
+             <div
+               className="mb-6 p-4 rounded-lg text-gray-800 font-['SejongGeulggot']"
+               style={{ backgroundColor: emotion.color + "CC" }}
+             >
+               <div className="text-xl mb-2 font-semibold">감정 분석 결과</div>
+               <div>
+                 감정: {emotion.label} {emotion.emoji}
+               </div>
+               <div>감정 세기 (dim): {analysis.dim}</div>
+             </div>
+           );
+         })()}
+
           <div className="flex justify-center gap-4">
             <button
               onClick={handleBack}
@@ -121,12 +164,22 @@ function DiaryDetail() {
             >
               돌아가기
             </button>
-            <button
-              onClick={handleAnalysis}
-              className="bg-[#F5C451] text-white px-4 py-2 rounded font-['SejongGeulggot'] shadow-[0_4px_4px_3px_rgba(0,0,0,0.25)]"
-            >
-              오늘 나의 무드는?
-            </button>
+            {!analysis &&
+              (analyzing ? (
+                <button
+                  disabled
+                  className="bg-gray-300 text-white px-4 py-2 rounded font-['SejongGeulggot'] shadow"
+                >
+                  분석 중...
+                </button>
+              ) : (
+                <button
+                  onClick={handleAnalysis}
+                  className="bg-[#F5C451] text-white px-4 py-2 rounded font-['SejongGeulggot'] shadow-[0_4px_4px_3px_rgba(0,0,0,0.25)]"
+                >
+                  오늘 나의 무드는?
+                </button>
+              ))}
           </div>
         </div>
       </div>

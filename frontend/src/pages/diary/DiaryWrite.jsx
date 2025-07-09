@@ -3,17 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import "../../index.css"; // bg-paper가 정의되어 있는 CSS
 import axios from "axios";
 import Toast from "../../components/common/Alert";
-
-const API_BASE_URL = "http://localhost:8080/api/diaries";
-
-export const createDiary = async (diary) => {
-  try {
-    const response = await axios.post(API_BASE_URL, diary);
-    return response.data.data;
-  } catch (error) {
-    throw error.response?.data || error;
-  }
-};
+import { createDiary } from "../../services/diary";
 
 function DiaryWrite() {
   const location = useLocation();
@@ -46,7 +36,7 @@ function DiaryWrite() {
 
       setTimeout(() => {
         setShowToast(false);
-        navigate("/diary");
+        navigate(`/diary`);
       }, 2000);
     } catch (err) {
       console.error("일기 등록 실패:", err);
