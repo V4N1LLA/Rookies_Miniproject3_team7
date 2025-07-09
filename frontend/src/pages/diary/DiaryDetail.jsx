@@ -7,7 +7,7 @@ function DiaryDetail() {
   const navigate = useNavigate();
   const [diary, setDiary] = React.useState(null);
   const [loading, setLoading] = React.useState(true);
-
+  
   React.useEffect(() => {
     axios
       .get(`http://localhost:8080/api/diaries/${id}`, {
@@ -29,6 +29,10 @@ function DiaryDetail() {
   const handleBack = () => {
     navigate("/diary");
   };
+
+  const handleAnalysis = () => {
+
+  }
 
   if (loading) {
     return (
@@ -111,19 +115,19 @@ function DiaryDetail() {
             </div>
           </div>
 
-          <div className="flex justify-center">
+          <div className="flex justify-center gap-4">
             <button
               onClick={handleBack}
               className="bg-gray-500 text-white px-4 py-2 rounded font-['SejongGeulggot'] shadow-[0_4px_4px_3px_rgba(0,0,0,0.25)]"
             >
               돌아가기
             </button>
-            {/* <button
-              onClick={handleEdit}
-              className="bg-blue-500 text-white px-4 py-2 rounded font-['SejongGeulggot'] shadow-[0_4px_4px_3px_rgba(0,0,0,0.25)]"
+            <button
+              onClick={handleAnalysis}
+              className="bg-[#F5C451] text-white px-4 py-2 rounded font-['SejongGeulggot'] shadow-[0_4px_4px_3px_rgba(0,0,0,0.25)]"
             >
-              수정하기
-            </button> */}
+              오늘 나의 무드는?
+            </button>
           </div>
         </div>
       </div>

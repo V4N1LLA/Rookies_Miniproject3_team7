@@ -2,6 +2,7 @@ import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "../../index.css"; // bg-paper가 정의되어 있는 CSS
 import axios from "axios";
+import Toast from "../../components/common/Alert";
 
 const API_BASE_URL = "http://localhost:8080/api/diaries";
 
@@ -23,6 +24,8 @@ function DiaryWrite() {
   const [selectedWeather, setSelectedWeather] = React.useState(null);
   const [title, setTitle] = React.useState("");
   const [content, setContent] = React.useState("");
+  const [showToast, setShowToast] = React.useState(false);
+
   const handleBack = () => {
     navigate("/diary");
   };
@@ -39,8 +42,12 @@ function DiaryWrite() {
         content: content,
       });
 
-      alert("일기가 등록되었습니다!");
-      navigate("/diary");
+      setShowToast(true);
+
+      setTimeout(() => {
+        setShowToast(false);
+        navigate("/diary");
+      }, 2000);
     } catch (err) {
       console.error("일기 등록 실패:", err);
       alert("일기 등록에 실패했습니다.");
@@ -104,6 +111,12 @@ function DiaryWrite() {
           </button>
         </div>
       </div>
+      {showToast && (
+        <Toast
+          message="일기가 등록되었습니다!"
+          onClose={() => setShowToast(false)}
+        />
+      )}
     </div>
   );
 }
