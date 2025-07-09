@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 export default function Signup() {
   const [email, setEmail] = useState("");
-  const [nickname, setNickname] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
@@ -17,7 +17,7 @@ export default function Signup() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, nickname, password }),
+        body: JSON.stringify({ email, username, password }),
       });
 
       if (res.ok) {
@@ -35,7 +35,6 @@ export default function Signup() {
   return (
     <div className="min-h-screen w-screen bg-[#1C262B] flex justify-center items-center">
       <div className="bg-[#F5F5F5] w-[360px] rounded-2xl shadow-xl p-8 border border-gray-300 font-['SejongGeulggot']">
-        
         {/* 감정/날씨 아이콘 */}
         <div className="flex justify-around items-center mb-6 border-b border-gray-300 pb-4">
           <img src="/icons/sun.svg" alt="sun" className="w-6 h-6" />
@@ -54,8 +53,8 @@ export default function Signup() {
               type="text"
               placeholder="이름"
               className="w-full px-4 py-2 border rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 shadow-sm"
-              value={nickname}
-              onChange={(e) => setNickname(e.target.value)}
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               required
             />
           </div>
