@@ -12,6 +12,15 @@ function MainPage() {
     return () => clearTimeout(timer);
   }, []);
 
+  const start = () => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      window.location.href = "/diary";
+    } else {
+      window.location.href = "/login";
+    }
+  };
+
   return (
     <div className="min-h-screen bg-emotion-dots flex flex-col items-center justify-center text-white font-erica">
       {!showStartButton ? (
@@ -34,7 +43,10 @@ function MainPage() {
           >
             Moodiary
           </h1>
-          <button className="font-noto mt-8 px-8 py-3 rounded-full bg-gray-200 text-black shadow-md hover:scale-105 transition-transform duration-500">
+          <button
+            className="font-noto mt-8 px-8 py-3 rounded-full bg-gray-200 text-black shadow-md hover:scale-105 transition-transform duration-500"
+            onClick={start}
+          >
             START
           </button>
         </>

@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Toast from "../../components/common/Alert";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showToast, setShowToast] = React.useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
@@ -21,8 +23,12 @@ export default function Login() {
       if (res.ok) {
         const data = await res.json();
         localStorage.setItem("token", data.token);
-        alert("로그인 성공");
-        navigate("/diary");
+        setShowToast(true);
+
+        setTimeout(() => {
+          setShowToast(false);
+          navigate(`/diary`);
+        }, 1000);
       } else {
         alert("이메일 또는 비밀번호가 올바르지 않습니다.");
       }
@@ -100,6 +106,9 @@ export default function Login() {
           </span>
         </p>
       </div>
+      {showToast && (
+        <Toast message="로그인 성공!" onClose={() => setShowToast(false)} />
+      )}
     </div>
   );
 }

@@ -9,9 +9,7 @@ function DiaryDetail() {
   const navigate = useNavigate();
   const [diary, setDiary] = React.useState(null);
   const [loading, setLoading] = React.useState(true);
-  const token =
-    "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiLsobDsnYDsp4AiLCJpYXQiOjE3NTIwNDI2MDQsImV4cCI6MTc1MjEyOTAwNH0.hX7rizanl6bw4f2rMRlotR4f7sibnGhG7n8FMQ-dHxo";
-
+  const token = localStorage.getItem("token");
   const [analysis, setAnalysis] = React.useState(null);
   const [analyzing, setAnalyzing] = React.useState(false);
 
@@ -154,21 +152,24 @@ function DiaryDetail() {
             </div>
           </div>
 
-         {analysis && (() => {
-           const emotion = getKoreanEmotion(analysis.domainEmotion);
-           return (
-             <div
-               className="mb-6 p-4 rounded-lg text-gray-800 font-['SejongGeulggot']"
-               style={{ backgroundColor: emotion.color + "CC" }}
-             >
-               <div className="text-xl mb-2 font-semibold">감정 분석 결과</div>
-               <div>
-                 감정: {emotion.label} {emotion.emoji}
-               </div>
-               <div>감정 세기 (dim): {analysis.dim}</div>
-             </div>
-           );
-         })()}
+          {analysis &&
+            (() => {
+              const emotion = getKoreanEmotion(analysis.domainEmotion);
+              return (
+                <div
+                  className="mb-6 p-4 rounded-lg text-gray-800 font-['SejongGeulggot']"
+                  style={{ backgroundColor: emotion.color + "CC" }}
+                >
+                  <div className="text-xl mb-2 font-semibold">
+                    감정 분석 결과
+                  </div>
+                  <div>
+                    감정: {emotion.label} {emotion.emoji}
+                  </div>
+                  <div>감정 세기 (dim): {analysis.dim}</div>
+                </div>
+              );
+            })()}
 
           <div className="flex justify-center gap-4">
             <button
