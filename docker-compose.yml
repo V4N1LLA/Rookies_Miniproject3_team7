@@ -8,6 +8,8 @@ services:
     container_name: backend
     ports:
       - "8080:8080"
+    env_file:
+      - .env  # ✅ 외부 DB 정보 (.env 파일에서 가져옴)
     environment:
       SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
       SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
@@ -23,35 +25,26 @@ services:
     ports:
       - "8000:8000"
     env_file:
-      - ./python-emotion-api/.env  # ✅ 이 줄을 추가하여 .env 파일을 읽도록 설정
+      - ./python-emotion-api/.env  # ✅ 필요시 감정 API 환경변수
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/docs"]
       interval: 5s
       timeout: 3s
       retries: 5
 
-    #  frontend:
- #   build:
-  #    context: ./frontend
-   # container_name: frontend
-#    ports:
- #     - "3000:80"
-  #  depends_on:
-   #   - backend
+# frontend:
+#   build:
+#     context: ./frontend
+#   container_name: frontend
+#   ports:
+#     - "3000:80"
+#   depends_on:
+#     - backend
+#   networks:
+#     - app-network
 
-  #db:
-  # image: mariadb:10.11
-  #  container_name: mariadb
-  # restart: always
-  # ports:
-  #   - "3306:3306"
-  # environment:
-  #   MARIADB_ROOT_PASSWORD: 1234
-  #   MARIADB_DATABASE: moodiary
-  #   MARIADB_USER: moodiary
-  #   MARIADB_PASSWORD: moodiary
-  #  volumes:
-  #   - db_data:/var/lib/mysql
+volumes:
+  db_data:
 
-#volumes:
-#  db_data:
+networks:
+  app-network:
