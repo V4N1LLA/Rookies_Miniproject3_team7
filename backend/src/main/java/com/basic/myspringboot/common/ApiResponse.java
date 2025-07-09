@@ -1,15 +1,26 @@
 package com.basic.myspringboot.common;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
+import java.time.ZonedDateTime;
 
-@Data
-@AllArgsConstructor
-@Builder
+@Getter @Setter @Builder
+@AllArgsConstructor @NoArgsConstructor
 public class ApiResponse<T> {
     private boolean success;
-    private String message;
     private T data;
+    private String message;
     private String timestamp;
+
+    public static <T> ApiResponse<T> ok(T data, String msg) {
+        return ApiResponse.<T>builder()
+                .success(true).data(data).message(msg)
+                .timestamp(ZonedDateTime.now().toString())
+                .build();
+    }
+    public static <T> ApiResponse<T> fail(String msg) {
+        return ApiResponse.<T>builder()
+                .success(false).data(null).message(msg)
+                .timestamp(ZonedDateTime.now().toString())
+                .build();
+    }
 }
