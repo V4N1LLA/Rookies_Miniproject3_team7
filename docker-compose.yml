@@ -1,23 +1,21 @@
-version: '3.8'
-services:
-  mariadb:
-    image: mariadb:latest
-    container_name: mariadb
-    restart: always
-    environment:
-      MARIADB_ROOT_PASSWORD: maria
-      MARIADB_DATABASE: moodiary_db
-      MARIADB_USER: moodiary
-      MARIADB_PASSWORD: moodiary
-    ports:
-      - "3306:3306"
-    volumes:
-      - db_data:/var/lib/mysql
-    networks:
-      - app-network
+version: "3.8"
 
-volumes:
-  db_data:
+services:
+  springboot-app:
+    build: ./backend
+    ports:
+      - "8080:8080"
+    networks:
+      - moodiary-net
+
+  fastapi-chatbot:
+    build: ./chatbot
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./chatbot/.env
+    networks:
+      - moodiary-net
 
 networks:
-  app-network:
+  moodiary-net:
