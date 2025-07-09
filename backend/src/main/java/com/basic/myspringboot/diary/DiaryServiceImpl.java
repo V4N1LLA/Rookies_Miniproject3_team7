@@ -1,8 +1,8 @@
 package com.basic.myspringboot.diary;
 
-import com.basic.myspringboot.diary.exception.DuplicateDiaryException;
 import com.basic.myspringboot.analysis.entity.EmotionAnalysisResult;
 import com.basic.myspringboot.analysis.service.EmotionAnalysisService;
+import com.basic.myspringboot.diary.exception.DuplicateDiaryException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,38 +15,18 @@ import java.util.Optional;
 public class DiaryServiceImpl implements DiaryService {
 
     private final DiaryRepository diaryRepository;
-    private final EmotionAnalysisService emotionAnalysisService;
 
-    // ✅ 감정 분석 없이 일기 작성
-    @Override
-    public Diary createDiaryWithoutAnalysis(DiaryRequestDto dto, Long userId) {
-        LocalDateTime timestamp = dto.getTimestamp();
-        checkIfDiaryAlreadyExists(userId, timestamp);
-
-        Diary diary = Diary.builder()
-                .userId(userId)
-                .title(dto.getTitle())
-                .content(dto.getContent())
-                .timestamp(timestamp)
-                .build();
-
-        return diaryRepository.save(diary);
-    }
-
-    // ✅ 감정 분석 포함 일기 작성
+    // ✅ 감정 분석 없이 일기만 등록
     @Override
     public Diary createDiary(DiaryRequestDto dto, Long userId) {
         LocalDateTime timestamp = dto.getTimestamp();
         checkIfDiaryAlreadyExists(userId, timestamp);
 
-        EmotionAnalysisResult analysisResult = emotionAnalysisService.analyzeAndSave(dto.getContent());
-
         Diary diary = Diary.builder()
                 .userId(userId)
                 .title(dto.getTitle())
                 .content(dto.getContent())
                 .timestamp(timestamp)
-                .analysisResult(analysisResult)
                 .build();
 
         return diaryRepository.save(diary);
@@ -73,7 +53,7 @@ public class DiaryServiceImpl implements DiaryService {
         diaryRepository.deleteById(id);
     }
 
-    // ✅ 하루 하나 작성 제약 체크 메서드
+    // ✅ 하루 하나 작성 제약 체크
     private void checkIfDiaryAlreadyExists(Long userId, LocalDateTime timestamp) {
         LocalDateTime startOfDay = timestamp.toLocalDate().atStartOfDay();
         LocalDateTime endOfDay = startOfDay.plusDays(1).minusNanos(1);

@@ -64,7 +64,7 @@ public class DiaryController {
             @RequestBody DiaryRequestDto requestDto,
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
 
-        Diary diary = diaryService.createDiaryWithoutAnalysis(requestDto, userPrincipal.getId());
+        Diary diary = diaryService.createDiary(requestDto, userPrincipal.getId());
 
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("diaryId", diary.getDiaryId());

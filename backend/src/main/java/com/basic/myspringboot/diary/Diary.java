@@ -1,6 +1,7 @@
 package com.basic.myspringboot.diary;
 
 import com.basic.myspringboot.analysis.entity.EmotionAnalysisResult;
+import com.basic.myspringboot.message.EncouragementMessage;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,7 +20,7 @@ public class Diary {
     private Long diaryId;
 
     @Column(nullable = false)
-    private Long userId;  // JWT에서 추출 예정
+    private Long userId;
 
     @Column(nullable = false)
     private String title;
@@ -33,6 +34,9 @@ public class Diary {
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "analysis_id")
     private EmotionAnalysisResult analysisResult;
+
+    @OneToOne(mappedBy = "diary", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private EncouragementMessage encouragementMessage;
 
     @PrePersist
     protected void onCreate() {
