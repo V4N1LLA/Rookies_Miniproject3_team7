@@ -28,13 +28,13 @@ public class EmotionClient {
         EmotionRequestDto request = new EmotionRequestDto(content);
 
         EmotionResponseDto response = webClient.post()
-                .uri("/analyze")
+                .uri("/api/emotion")  // ✅ 변경됨
                 .bodyValue(request)
                 .retrieve()
                 .bodyToMono(EmotionResponseDto.class)
-                .block();  // 동기 호출
+                .block();
 
-        System.out.println("🧪 Emotion API 응답: " + response);  // ✅ 응답 확인
+        System.out.println("🧪 Emotion API 응답: " + response);
 
         return response;
     }
