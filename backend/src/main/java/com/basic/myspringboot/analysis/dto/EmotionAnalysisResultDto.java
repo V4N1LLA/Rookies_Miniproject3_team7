@@ -44,11 +44,11 @@ public class EmotionAnalysisResultDto {
                 .createdAt(entity.getCreatedAt())
                 .message(messageText)
                 .diaryId(diaryId)
-                .scores(
-                        entity.getScores().stream()
-                                .map(EmotionScoreDto::fromEntity)
-                                .collect(Collectors.toList())
-                )
+                //.scores(
+                //        entity.getScores().stream()
+                //                .map(EmotionScoreDto::fromEntity)
+                //                .collect(Collectors.toList())
+                //)
                 .build();
     }
 }
