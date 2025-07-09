@@ -1,15 +1,20 @@
 import "./App.css";
+
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./pages/auth/Login";
-import Signup from "./pages/auth/Signups";
+import Signup from "./pages/auth/Signup";
 
 function App() {
   return (
     <Router>
       <Routes>
         {/* <Route path="/" element={<MainPage />} /> */}
+
+        {/* 로그인 / 회원가입 라우트 */}
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+
+        {/* 다이어리 라우트 */}
         {/* <Route path="/diary" element={<Calendar />} />
         <Route path="/diary/DiaryWrite" element={<DiaryWrite />} />
         <Route path="/diary/DiaryDetail/:id" element={<DiaryDetail />} /> */}
