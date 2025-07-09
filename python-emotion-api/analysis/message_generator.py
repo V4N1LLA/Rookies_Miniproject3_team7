@@ -12,14 +12,12 @@ def generate_empathy_message(emotion: str, content: str) -> str:
     if not openai_api_key:
         raise ValueError("OPENAI_API_KEY가 .env에 없습니다.")
 
-    # 모델 설정
     llm = ChatOpenAI(
         temperature=0.7,
         model_name="gpt-3.5-turbo",
         openai_api_key=openai_api_key
     )
 
-    # 프롬프트 정의
     prompt = PromptTemplate(
         input_variables=["emotion", "content"],
         template=(
@@ -30,8 +28,7 @@ def generate_empathy_message(emotion: str, content: str) -> str:
         )
     )
 
-    # 최신 방식: prompt | llm
     chain = prompt | llm
+    result = chain.invoke({"emotion": emotion, "content": content})
 
-    # 실행
-    return chain.invoke({"emotion": emotion, "content": content})
+    return result.content  # ✅ 문자열만 추출해서 반환
