@@ -1,16 +1,20 @@
 package com.basic.myspringboot.analysis.controller;
 
-import com.basic.myspringboot.analysis.dto.EmotionAnalysisRequest;
 import com.basic.myspringboot.analysis.dto.EmotionAnalysisResultDto;
+import com.basic.myspringboot.analysis.entity.EmotionAnalysisResult;
 import com.basic.myspringboot.analysis.service.EmotionAnalysisService;
+import com.basic.myspringboot.diary.Diary;
+import com.basic.myspringboot.diary.DiaryService;
 import com.basic.myspringboot.common.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.ZonedDateTime;
-import java.util.List;
+import java.util.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,18 +23,42 @@ import java.util.List;
 public class EmotionAnalysisController {
 
     private final EmotionAnalysisService analysisService;
+    private final DiaryService diaryService;
 
-    @PostMapping
-    @Operation(summary = "감정 분석 요청", description = "일기 내용을 입력받아 감정 분석을 수행하고 DB에 저장합니다.")
-    public ApiResponse<EmotionAnalysisResultDto> analyze(@RequestBody EmotionAnalysisRequest request) {
-        EmotionAnalysisResultDto resultDto = analysisService.analyzeAndReturnDto(request.getContent());
+    private Map<String, Object> buildResponse(Object data, String message, boolean success) {
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("success", success);
+        response.put("message", message);
+        response.put("data", data);
+        response.put("timestamp", ZonedDateTime.now().toString());
+        return response;
+    }
 
-        return ApiResponse.<EmotionAnalysisResultDto>builder()
-                .success(true)
-                .message("감정 분석이 완료되었습니다.")
-                .data(resultDto)
-                .timestamp(ZonedDateTime.now().toString())
-                .build();
+    @Operation(summary = "등록된 일기 감정 분석", description = "기존 일기에 대해 감정 분석을 수행합니다.")
+    @io.swagger.v3.oas.annotations.responses.ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200", description = "분석 성공", content = @Content(mediaType = "application/json")),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "400", description = "이미 분석된 일기", content = @Content(mediaType = "application/json"))
+    })
+    @PostMapping("/{id}/analyze")
+    public ResponseEntity<Map<String, Object>> analyzeDiary(@PathVariable Long id) {
+        Diary diary = diaryService.getDiaryById(id);
+
+        if (diary.getAnalysisResult() != null) {
+            return ResponseEntity.badRequest().body(buildResponse(null, "이미 분석된 일기입니다.", false));
+        }
+
+        EmotionAnalysisResult analysisResult = analysisService.analyzeAndSave(diary.getContent());
+        diary.setAnalysisResult(analysisResult);
+        diaryService.saveDiary(diary);
+
+        Map<String, Object> data = new LinkedHashMap<>();
+        data.put("diaryId", diary.getDiaryId());
+        data.put("domainEmotion", analysisResult.getDomainEmotion());
+        data.put("dim", analysisResult.getDim());
+
+        return ResponseEntity.ok(buildResponse(data, "감정 분석이 완료되었습니다.", true));
     }
 
     @GetMapping("/{id}")

@@ -17,7 +17,7 @@ import java.util.*;
 @RestController
 @RequestMapping("/api/diaries")
 @RequiredArgsConstructor
-@Tag(name = "Diary", description = "일기 작성 및 감정 분석 API")
+@Tag(name = "다이어리", description = "일기 작성 및 감정 분석 API")
 public class DiaryController {
 
     private final DiaryService diaryService;
@@ -77,31 +77,6 @@ public class DiaryController {
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(buildResponse(data, "일기가 등록되었습니다.", true));
-    }
-
-    @Operation(summary = "등록된 일기 감정 분석", description = "기존 일기에 대해 감정 분석을 수행합니다.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "분석 성공", content = @Content(mediaType = "application/json")),
-            @ApiResponse(responseCode = "400", description = "이미 분석된 일기", content = @Content(mediaType = "application/json"))
-    })
-    @PostMapping("/{id}/analyze")
-    public ResponseEntity<Map<String, Object>> analyzeDiary(@PathVariable Long id) {
-        Diary diary = diaryService.getDiaryById(id);
-
-        if (diary.getAnalysisResult() != null) {
-            return ResponseEntity.badRequest().body(buildResponse(null, "이미 분석된 일기입니다.", false));
-        }
-
-        EmotionAnalysisResult analysisResult = emotionAnalysisService.analyzeAndSave(diary.getContent());
-        diary.setAnalysisResult(analysisResult);
-        diaryService.saveDiary(diary);
-
-        Map<String, Object> data = new LinkedHashMap<>();
-        data.put("diaryId", diary.getDiaryId());
-        data.put("domainEmotion", analysisResult.getDomainEmotion());
-        data.put("dim", analysisResult.getDim());
-
-        return ResponseEntity.ok(buildResponse(data, "감정 분석이 완료되었습니다.", true));
     }
 
     @Operation(summary = "일기 단건 조회", description = "ID를 기반으로 특정 일기를 조회합니다.")
