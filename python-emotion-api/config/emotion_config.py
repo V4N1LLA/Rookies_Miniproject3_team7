@@ -1,5 +1,3 @@
-# 📁 config/emotion_config.py
-
 # 감정 라벨 매핑
 label_map = {
     "기쁨": "HAPPY",
@@ -11,11 +9,11 @@ label_map = {
 
 # 감정 보정 계수
 adjustment = {
-    "HAPPY": 1.0,
-    "SAD": 1.0,
+    "HAPPY": 2.0,
+    "SAD": 1.2,
     "ANGRY": 1.0,
     "FEAR": 1.0,
-    "TENDER": 0.6,
+    "TENDER": 0.2,
 }
 
 # 감정 키워드 가산
@@ -24,10 +22,10 @@ keyword_boost = {
     "HAPPY": ["기쁘", "행복", "웃었", "즐거웠", "좋았", "만족"],
     "ANGRY": ["화났", "짜증", "억울", "분노", "열받", "짜증나"],
     "FEAR": ["불안", "무서웠", "두려웠", "겁났"],
-    "TENDER": ["긴장", "불편", "신경", "초조"]
+    "TENDER": ["중립", "평온", "차분", "괜찮", "무던"]
 }
 
-# 감정 우선순위 (동점 시 적용)
+# 감정 우선순위 (동점일 때 사용)
 emotion_priority = ["SAD", "ANGRY", "FEAR", "HAPPY", "TENDER"]
 
 # 전체 감정 코드 목록

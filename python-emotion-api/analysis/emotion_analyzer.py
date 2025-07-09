@@ -11,7 +11,7 @@ label_name_map = {
     "LABEL_0": "분노",
     "LABEL_1": "불안",
     "LABEL_2": "기쁨",
-    "LABEL_3": "다정",
+    "LABEL_3": "중립",
     "LABEL_4": "슬픔"
 }
 
