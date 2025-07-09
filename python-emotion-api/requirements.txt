@@ -1,0 +1,7 @@
+﻿fastapi
+uvicorn
+pydantic
+transformers
+torch
+numpy
+python-dotenv
