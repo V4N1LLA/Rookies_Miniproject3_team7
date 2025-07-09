@@ -29,7 +29,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         try {
             String path = request.getRequestURI();
             // 로그인/회원가입 요청은 필터 건너뜀
-            if (path.startsWith("/auth/login") || path.startsWith("/auth/signup")) {
+            if (path.startsWith("/api/auth/login") || path.startsWith("/api/auth/signup")) {
                 filterChain.doFilter(request, response);
                 return;
             }
