@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 
 const emotionMap = {
-  angry: { color: "#FE4E4E", emoji: "😡" },
-  happy: { color: "#FFC548", emoji: "🤣" },
-  sad: { color: "#6DD0F0", emoji: "😭" },
+  ANGRY: { color: "#FE4E4E", emoji: "😡" },
+  HAPPY: { color: "#FFC548", emoji: "🤣" },
+  SAD: { color: "#6DD0F0", emoji: "😭" },
   anxious: { color: "#634490", emoji: "😯" },
   nervous: { color: "#F88642", emoji: "😳" },
   tired: { color: "#008478", emoji: "😫" },
   bored: { color: "#9747FF", emoji: "🥱" },
-  embarrassed: { color: "#FE76B4", emoji: "😵‍💫" },
+  EMBARR: { color: "#FE76B4", emoji: "😵‍💫" },
 };
 
 function EmotionBubble({ emotion }) {
