@@ -1,22 +1,6 @@
 version: '3.8'
 
 services:
-  mariadb:
-    image: mariadb:10.11
-    container_name: mariadb
-    restart: always
-    environment:
-      MARIADB_ROOT_PASSWORD: moodiary
-      MARIADB_DATABASE: moodiary_db
-      MARIADB_USER: moodiary
-      MARIADB_PASSWORD: moodiary
-    ports:
-      - "3306:3306"
-    volumes:
-      - db_data:/var/lib/mysql
-    networks:
-      - app-network
-
   backend:
     build:
       context: ./backend
@@ -24,16 +8,15 @@ services:
     container_name: backend
     ports:
       - "8080:8080"
+    env_file:
+      - .env  # ✅ 외부 DB 정보 (.env 파일에서 가져옴)
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mariadb://mariadb:3306/moodiary_db
-      SPRING_DATASOURCE_USERNAME: moodiary
-      SPRING_DATASOURCE_PASSWORD: moodiary
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
       EMOTION_API_URL: http://emotion-api:8000
     depends_on:
-      - mariadb
       - emotion-api
-    networks:
-      - app-network
 
   emotion-api:
     build:
@@ -41,24 +24,24 @@ services:
     container_name: emotion-api
     ports:
       - "8000:8000"
+    env_file:
+      - ./python-emotion-api/.env  # ✅ 필요시 감정 API 환경변수
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/docs"]
       interval: 5s
       timeout: 3s
       retries: 5
-    networks:
-      - app-network
 
-  frontend:
-    build:
-      context: ./frontend
-    container_name: frontend
-    ports:
-      - "3000:80"
-    depends_on:
-      - backend
-    networks:
-      - app-network
+# frontend:
+#   build:
+#     context: ./frontend
+#   container_name: frontend
+#   ports:
+#     - "3000:80"
+#   depends_on:
+#     - backend
+#   networks:
+#     - app-network
 
 volumes:
   db_data:
