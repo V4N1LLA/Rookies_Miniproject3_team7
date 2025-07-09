@@ -23,6 +23,7 @@ function Calendar() {
   const { year, month, setYear, setMonth } = useCalendarStore();
   const navigate = useNavigate();
   const [diaryDates, setDiaryDates] = useState([]);
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
     fetchDiaries()

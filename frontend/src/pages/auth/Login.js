@@ -35,14 +35,21 @@ export default function Login() {
   return (
     <div className="min-h-screen w-screen bg-[#1C262B] flex justify-center items-center">
       <div className="bg-[#F5F5F5] w-[360px] rounded-2xl shadow-xl p-8 border border-gray-300 font-['SejongGeulggot']">
-
         {/* 감정/날씨 아이콘 */}
         <div className="flex justify-around items-center mb-6 border-b border-gray-300 pb-4">
           <img src="/icons/sun.svg" alt="sun" className="w-6 h-6" />
           <img src="/icons/cloud rain.svg" alt="cloud" className="w-6 h-6" />
           <img src="/icons/sun.svg" alt="rain" className="w-6 h-6" />
-          <img src="/icons/cloud rain.svg" alt="heavy rain" className="w-6 h-6" />
-          <img src="/icons/cloud rain.svg" alt="heavy rain" className="w-6 h-6" />
+          <img
+            src="/icons/cloud rain.svg"
+            alt="heavy rain"
+            className="w-6 h-6"
+          />
+          <img
+            src="/icons/cloud rain.svg"
+            alt="heavy rain"
+            className="w-6 h-6"
+          />
         </div>
 
         {/* 로그인 타이틀 */}

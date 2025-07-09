@@ -7,32 +7,31 @@ function DiaryDetail() {
   const navigate = useNavigate();
   const [diary, setDiary] = React.useState(null);
   const [loading, setLoading] = React.useState(true);
-  
+  const token = localStorage.getItem("token");
+
   React.useEffect(() => {
-    axios
-      .get(`http://localhost:8080/api/diaries/${id}`, {
-        headers: {
-          Authorization: "Bearer test-token-1234",
-        },
-      })
-      .then((res) => {
+    const fetchDiary = async () => {
+      try {
+        const res = await axios.get(`http://localhost:8080/api/diaries/${id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         setDiary(res.data.data);
-        setLoading(false);
-      })
-      .catch((err) => {
+      } catch (err) {
         console.error("다이어리 불러오기 실패:", err);
         setDiary(null);
+      } finally {
         setLoading(false);
-      });
-  }, [id]);
+      }
+    };
+
+    if (token) fetchDiary();
+  }, [id, token]);
 
   const handleBack = () => {
     navigate("/diary");
   };
 
-  const handleAnalysis = () => {
-
-  }
+  const handleAnalysis = () => {};
 
   if (loading) {
     return (

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 
 const emotionMap = {
   ANGRY: { color: "#FE4E4E", emoji: "😡" },
-  HAPPY: { color: "#FFC548", emoji: "🤣" },
+  HAPPY: { color: "#FFC548", emoji: "😁" },
   SAD: { color: "#6DD0F0", emoji: "😭" },
   anxious: { color: "#634490", emoji: "😯" },
   nervous: { color: "#F88642", emoji: "😳" },
