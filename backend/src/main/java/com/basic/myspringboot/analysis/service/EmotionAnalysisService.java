@@ -5,6 +5,8 @@ import com.basic.myspringboot.analysis.dto.EmotionAnalysisResultDto;
 import com.basic.myspringboot.analysis.dto.EmotionResponseDto;
 import com.basic.myspringboot.analysis.entity.*;
 import com.basic.myspringboot.analysis.repository.*;
+import com.basic.myspringboot.diary.Diary;
+import com.basic.myspringboot.diary.DiaryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +23,7 @@ public class EmotionAnalysisService {
     private final EmotionScoreRepository scoreRepository;
     private final AnalysisVectorRepository vectorRepository;
     private final EmotionEnumRepository emotionEnumRepository;
-
+    private final DiaryRepository diaryRepository;
     private final EmotionClient emotionClient;
 
     // ✅ 감정 분석 후 저장
@@ -71,15 +73,18 @@ public class EmotionAnalysisService {
         return EmotionAnalysisResultDto.from(saved);
     }
 
-    // ✅ 단건 조회
-    public EmotionAnalysisResult findById(Long id) {
-        return resultRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("해당 분석 결과를 찾을 수 없습니다. id=" + id));
-    }
+    // ✅ 일기 ID 기반 단건 조회 (DTO 반환)
+    public EmotionAnalysisResultDto getByDiaryId(Long diaryId) {
+        Diary diary = diaryRepository.findById(diaryId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 일기를 찾을 수 없습니다. id=" + diaryId));
 
-    // ✅ 단건 조회 (DTO 버전)
-    public EmotionAnalysisResultDto getAnalysisResultDto(Long id) {
-        return EmotionAnalysisResultDto.from(findById(id));
+        EmotionAnalysisResult result = diary.getAnalysisResult();
+
+        if (result == null) {
+            throw new IllegalArgumentException("해당 일기에 감정 분석 결과가 없습니다.");
+        }
+
+        return EmotionAnalysisResultDto.from(result);
     }
 
     // ✅ 전체 조회 (DTO 리스트)
@@ -89,4 +94,6 @@ public class EmotionAnalysisService {
                 .map(EmotionAnalysisResultDto::from)
                 .collect(Collectors.toList());
     }
+
+
 }

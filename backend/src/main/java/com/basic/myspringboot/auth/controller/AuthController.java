@@ -20,21 +20,21 @@ public class AuthController {
     /* ---------- 회원가입 ---------- */
     @Operation(summary = "회원가입")
     @PostMapping("/signup")
-    public ResponseEntity<String> signup(@RequestBody SignupRequestDto dto) {
+    public ResponseEntity<?> signup(@RequestBody SignupRequestDto dto) {
         return authService.signup(dto);
     }
 
     /* ---------- 로그인 ---------- */
     @Operation(summary = "로그인(토큰 발급)")
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto dto) {
+    public ResponseEntity<?> login(@RequestBody LoginRequestDto dto) {
         return authService.login(dto);
     }
 
     /* ---------- 회원정보 수정 ---------- */
     @Operation(summary = "회원 정보 수정")
     @PutMapping("/update")
-    public ResponseEntity<String> updateUser(
+    public ResponseEntity<?> updateUser(
             Authentication authentication,
             @RequestBody UserUpdateRequestDto dto) {
 
@@ -44,7 +44,7 @@ public class AuthController {
     /* ---------- 회원 탈퇴 ---------- */
     @Operation(summary = "회원 탈퇴")
     @DeleteMapping("/delete")
-    public ResponseEntity<String> deleteUser(
+    public ResponseEntity<?> deleteUser(
             Authentication authentication,
             @RequestBody DeleteRequestDto dto) {
 

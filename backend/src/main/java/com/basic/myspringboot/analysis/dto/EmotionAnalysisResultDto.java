@@ -18,8 +18,8 @@ public class EmotionAnalysisResultDto {
     private String domainEmotion;
     private int dim;
     private LocalDateTime createdAt;
-    private String message;   // ✅ 공감 메시지
-    private Long diaryId;     // ✅ 일기 ID 추가
+    private String message;
+    private Long diaryId;
 
     public static EmotionAnalysisResultDto from(EmotionAnalysisResult entity) {
         String messageText = null;
@@ -27,6 +27,8 @@ public class EmotionAnalysisResultDto {
 
         if (entity.getDiary() != null) {
             diaryId = entity.getDiary().getDiaryId();
+
+            // Lazy 로딩 강제 초기화
             if (entity.getDiary().getEncouragementMessage() != null) {
                 messageText = entity.getDiary().getEncouragementMessage().getText();
             }
