@@ -1,6 +1,7 @@
 package com.basic.myspringboot.analysis.service;
 
 import com.basic.myspringboot.analysis.client.EmotionClient;
+import com.basic.myspringboot.analysis.dto.EmotionAnalysisResultDto;
 import com.basic.myspringboot.analysis.dto.EmotionResponseDto;
 import com.basic.myspringboot.analysis.entity.*;
 import com.basic.myspringboot.analysis.repository.*;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -22,11 +24,10 @@ public class EmotionAnalysisService {
 
     private final EmotionClient emotionClient;
 
+    // ✅ 감정 분석 후 저장
     public EmotionAnalysisResult analyzeAndSave(String content) {
-        // 1. FastAPI로 감정 분석 요청
         EmotionResponseDto response = emotionClient.requestAnalysis(content);
 
-        // 2. EmotionAnalysisResult 저장
         EmotionAnalysisResult result = EmotionAnalysisResult.builder()
                 .domainEmotion(response.getDomainEmotion())
                 .dim(response.getDim())
@@ -34,7 +35,6 @@ public class EmotionAnalysisService {
                 .build();
         resultRepository.saveAndFlush(result);
 
-        // 3. EmotionScore 저장
         for (Map.Entry<String, Float> entry : response.getScores().entrySet()) {
             EmotionEnum emotionEnum = emotionEnumRepository.findByCode(entry.getKey())
                     .orElseGet(() -> {
@@ -52,8 +52,7 @@ public class EmotionAnalysisService {
             scoreRepository.save(score);
         }
 
-        // 4. AnalysisVector 저장
-        String vectorStr = response.getVector().toString(); // List<Float> → 문자열
+        String vectorStr = response.getVector().toString();
         AnalysisVector vector = AnalysisVector.builder()
                 .analysisResult(result)
                 .vector(vectorStr)
@@ -64,5 +63,30 @@ public class EmotionAnalysisService {
         vectorRepository.save(vector);
 
         return result;
+    }
+
+    // ✅ 감정 분석 후 DTO 반환
+    public EmotionAnalysisResultDto analyzeAndReturnDto(String content) {
+        EmotionAnalysisResult saved = analyzeAndSave(content);
+        return EmotionAnalysisResultDto.from(saved);
+    }
+
+    // ✅ 단건 조회
+    public EmotionAnalysisResult findById(Long id) {
+        return resultRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 분석 결과를 찾을 수 없습니다. id=" + id));
+    }
+
+    // ✅ 단건 조회 (DTO 버전)
+    public EmotionAnalysisResultDto getAnalysisResultDto(Long id) {
+        return EmotionAnalysisResultDto.from(findById(id));
+    }
+
+    // ✅ 전체 조회 (DTO 리스트)
+    public List<EmotionAnalysisResultDto> getAllAnalysisResultDtos() {
+        return resultRepository.findAll()
+                .stream()
+                .map(EmotionAnalysisResultDto::from)
+                .collect(Collectors.toList());
     }
 }

@@ -1,12 +1,37 @@
-def generate_message(content: str, emotion: str) -> str:
-    messages = {
-        "HAPPY": "기분 좋은 하루를 보내셨군요! 오늘의 행복이 오래가길 바라요 🌞",
-        "SAD": "오늘 힘든 일이 있었군요. 내일은 더 좋은 하루가 될 거예요 🌈",
-        "ANGRY": "많이 화가 나셨군요. 감정을 억누르지 말고 편히 표현해보세요 💢",
-        "FEAR": "불안한 감정이 드셨군요. 천천히 숨을 고르며 마음을 진정시켜보세요 🧘",
-        "TIRED": "많이 지치셨겠어요. 충분히 쉬어가는 하루가 되길 바랍니다 💤",
-        "EMBARR": "당황스러운 일이 있었군요. 누구나 실수는 할 수 있어요 😊",
-        "TENSE": "긴장되는 순간이었군요. 너무 잘하려 하지 않아도 괜찮아요 🤍",
-    }
+# ✅ message_generator.py
 
-    return messages.get(emotion, "당신의 감정을 이해하고 있어요. 스스로에게 친절하게 대해주세요 💙")
+from langchain_openai import ChatOpenAI
+from langchain.prompts import PromptTemplate
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+def generate_empathy_message(emotion: str, content: str) -> str:
+    openai_api_key = os.getenv("OPENAI_API_KEY")
+    if not openai_api_key:
+        raise ValueError("OPENAI_API_KEY가 .env에 없습니다.")
+
+    # 모델 설정
+    llm = ChatOpenAI(
+        temperature=0.7,
+        model_name="gpt-3.5-turbo",
+        openai_api_key=openai_api_key
+    )
+
+    # 프롬프트 정의
+    prompt = PromptTemplate(
+        input_variables=["emotion", "content"],
+        template=(
+            "당신은 감정 전문가입니다.\n"
+            "감정: {emotion}\n"
+            "일기 내용: {content}\n\n"
+            "감정을 공감하는 따뜻한 한국어 메시지를 한 문장으로 작성하세요."
+        )
+    )
+
+    # 최신 방식: prompt | llm
+    chain = prompt | llm
+
+    # 실행
+    return chain.invoke({"emotion": emotion, "content": content})
