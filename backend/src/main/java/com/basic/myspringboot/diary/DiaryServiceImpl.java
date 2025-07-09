@@ -1,11 +1,14 @@
 package com.basic.myspringboot.diary;
 
+import com.basic.myspringboot.diary.exception.DuplicateDiaryException;
 import com.basic.myspringboot.analysis.entity.EmotionAnalysisResult;
 import com.basic.myspringboot.analysis.service.EmotionAnalysisService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -14,28 +17,36 @@ public class DiaryServiceImpl implements DiaryService {
     private final DiaryRepository diaryRepository;
     private final EmotionAnalysisService emotionAnalysisService;
 
+    // ✅ 감정 분석 없이 일기 작성
     @Override
-    public Diary createDiary(DiaryRequestDto dto) {
-        EmotionAnalysisResult analysisResult = emotionAnalysisService.analyzeAndSave(dto.getContent());
+    public Diary createDiaryWithoutAnalysis(DiaryRequestDto dto, Long userId) {
+        LocalDateTime timestamp = dto.getTimestamp();
+        checkIfDiaryAlreadyExists(userId, timestamp);
 
         Diary diary = Diary.builder()
-                .userId(1L)  // 추후 JWT에서 대체
+                .userId(userId)
                 .title(dto.getTitle())
                 .content(dto.getContent())
-                .timestamp(dto.getTimestamp())
-                .analysisResult(analysisResult)
+                .timestamp(timestamp)
                 .build();
 
         return diaryRepository.save(diary);
     }
 
+    // ✅ 감정 분석 포함 일기 작성
     @Override
-    public Diary createDiaryWithoutAnalysis(DiaryRequestDto dto) {
+    public Diary createDiary(DiaryRequestDto dto, Long userId) {
+        LocalDateTime timestamp = dto.getTimestamp();
+        checkIfDiaryAlreadyExists(userId, timestamp);
+
+        EmotionAnalysisResult analysisResult = emotionAnalysisService.analyzeAndSave(dto.getContent());
+
         Diary diary = Diary.builder()
-                .userId(1L)  // 추후 JWT에서 대체
+                .userId(userId)
                 .title(dto.getTitle())
                 .content(dto.getContent())
-                .timestamp(dto.getTimestamp())
+                .timestamp(timestamp)
+                .analysisResult(analysisResult)
                 .build();
 
         return diaryRepository.save(diary);
@@ -48,7 +59,7 @@ public class DiaryServiceImpl implements DiaryService {
 
     @Override
     public List<Diary> getAllDiaries() {
-        return diaryRepository.findAllWithAnalysis(); // 🔥 fetch join
+        return diaryRepository.findAllWithAnalysis();
     }
 
     @Override
@@ -60,5 +71,16 @@ public class DiaryServiceImpl implements DiaryService {
     @Override
     public void deleteDiary(Long id) {
         diaryRepository.deleteById(id);
+    }
+
+    // ✅ 하루 하나 작성 제약 체크 메서드
+    private void checkIfDiaryAlreadyExists(Long userId, LocalDateTime timestamp) {
+        LocalDateTime startOfDay = timestamp.toLocalDate().atStartOfDay();
+        LocalDateTime endOfDay = startOfDay.plusDays(1).minusNanos(1);
+
+        Optional<Diary> existing = diaryRepository.findByUserIdAndTimestampBetween(userId, startOfDay, endOfDay);
+        if (existing.isPresent()) {
+            throw new DuplicateDiaryException("해당 날짜에 이미 작성된 일기가 있습니다.");
+        }
     }
 }

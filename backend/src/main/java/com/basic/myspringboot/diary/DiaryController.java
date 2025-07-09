@@ -2,12 +2,14 @@ package com.basic.myspringboot.diary;
 
 import com.basic.myspringboot.analysis.entity.EmotionAnalysisResult;
 import com.basic.myspringboot.analysis.service.EmotionAnalysisService;
+import com.basic.myspringboot.auth.security.UserPrincipal;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.*;
 import io.swagger.v3.oas.annotations.responses.*;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.ZonedDateTime;
@@ -32,9 +34,8 @@ public class DiaryController {
         return response;
     }
 
-    @Operation(summary = "전체 일기 조회", description = "작성된 모든 일기를 조회합니다.")
-    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(mediaType = "application/json"))
     @GetMapping
+    @Operation(summary = "전체 일기 조회", description = "작성된 모든 일기를 조회합니다.")
     public ResponseEntity<Map<String, Object>> getAllDiaries() {
         List<Diary> diaries = diaryService.getAllDiaries();
         List<Map<String, Object>> diaryList = diaries.stream().map(d -> {
@@ -57,17 +58,13 @@ public class DiaryController {
         return ResponseEntity.ok(buildResponse(diaryList, "다이어리 목록 조회 성공", true));
     }
 
-    @Operation(summary = "일기 작성", description = "감정 분석 없이 일기를 등록합니다.")
-    @ApiResponse(responseCode = "201", description = "등록 성공", content = @Content(mediaType = "application/json"))
     @PostMapping
+    @Operation(summary = "일기 작성", description = "감정 분석 없이 일기를 등록합니다.")
     public ResponseEntity<Map<String, Object>> createDiary(
-            @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "작성할 일기 내용",
-                    required = true,
-                    content = @Content(schema = @Schema(implementation = DiaryRequestDto.class)))
-            @RequestBody DiaryRequestDto requestDto) {
+            @RequestBody DiaryRequestDto requestDto,
+            @AuthenticationPrincipal UserPrincipal userPrincipal) {
 
-        Diary diary = diaryService.createDiaryWithoutAnalysis(requestDto);
+        Diary diary = diaryService.createDiaryWithoutAnalysis(requestDto, userPrincipal.getId());
 
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("diaryId", diary.getDiaryId());
@@ -79,9 +76,8 @@ public class DiaryController {
                 .body(buildResponse(data, "일기가 등록되었습니다.", true));
     }
 
-    @Operation(summary = "일기 단건 조회", description = "ID를 기반으로 특정 일기를 조회합니다.")
-    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(mediaType = "application/json"))
     @GetMapping("/{id}")
+    @Operation(summary = "일기 단건 조회", description = "ID를 기반으로 특정 일기를 조회합니다.")
     public ResponseEntity<Map<String, Object>> getDiaryById(@PathVariable Long id) {
         Diary diary = diaryService.getDiaryById(id);
 
@@ -101,9 +97,8 @@ public class DiaryController {
         return ResponseEntity.ok(buildResponse(data, "다이어리 조회 성공", true));
     }
 
-    @Operation(summary = "일기 삭제", description = "ID를 기반으로 일기를 삭제합니다.")
-    @ApiResponse(responseCode = "200", description = "삭제 성공", content = @Content(mediaType = "application/json"))
     @DeleteMapping("/{id}")
+    @Operation(summary = "일기 삭제", description = "ID를 기반으로 일기를 삭제합니다.")
     public ResponseEntity<Map<String, Object>> deleteDiary(@PathVariable Long id) {
         Diary diary = diaryService.getDiaryById(id);
         diaryService.deleteDiary(id);

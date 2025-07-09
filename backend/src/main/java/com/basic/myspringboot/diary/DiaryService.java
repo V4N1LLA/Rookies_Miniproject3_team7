@@ -3,8 +3,8 @@ package com.basic.myspringboot.diary;
 import java.util.List;
 
 public interface DiaryService {
-    Diary createDiary(DiaryRequestDto dto);
-    Diary createDiaryWithoutAnalysis(DiaryRequestDto dto);
+    Diary createDiary(DiaryRequestDto dto, Long userId);
+    Diary createDiaryWithoutAnalysis(DiaryRequestDto dto, Long userId);
     void saveDiary(Diary diary);
     List<Diary> getAllDiaries();
     Diary getDiaryById(Long id);
