@@ -129,14 +129,15 @@ function Calendar() {
                   onClick={() => handleDayClick(day)}
                 >
                   <div className="relative w-full h-full flex items-center justify-center">
+                    {" "}
+                    <span className="absolute z-40">{day || ""}</span>
                     {hasDiary && (
-                      <div className="absolute z-10 w-full h-full flex items-center justify-center">
+                      <div className="absolute w-full h-full flex items-center justify-center">
                         <EmotionBubble
                           emotion={diaryEntry.emotion?.toLowerCase()}
                         />
                       </div>
                     )}
-                    <span className="absolute z-40">{day || ""}</span>
                   </div>
                 </div>
               );

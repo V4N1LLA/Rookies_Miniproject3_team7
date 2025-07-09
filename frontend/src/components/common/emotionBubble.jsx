@@ -24,7 +24,7 @@ function EmotionBubble({ emotion }) {
       className="w-[60px] aspect-square rounded-full flex items-center justify-center cursor-pointer relative group"
       style={{ backgroundColor: color }}
     >
-      <span className="absolute z-10 opacity-0 group-hover:opacity-100 text-[30px] animate-bounce transition-opacity duration-300">
+      <span className="absolute z-50 opacity-0 group-hover:opacity-100 text-[30px] animate-bounce transition-opacity duration-300">
         {emoji}
       </span>
     </div>

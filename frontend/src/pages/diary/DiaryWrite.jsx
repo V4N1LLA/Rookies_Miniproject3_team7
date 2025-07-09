@@ -26,6 +26,18 @@ function DiaryWrite() {
     }
 
     try {
+      // 중복 일기 체크
+      const fetchDiaries = (await import("../../services/diary")).fetchDiaries;
+      const existingDiaries = await fetchDiaries();
+      const isDuplicate = existingDiaries.some(
+        (entry) => entry.timestamp.slice(0, 10) === date
+      );
+      if (isDuplicate) {
+        alert("해당 날짜에 이미 작성된 일기가 있습니다.");
+        navigate("/diary");
+        return;
+      }
+
       await createDiary({
         timestamp: `${date}T00:00:00`, // ISO 포맷에 맞게 조정
         title: title,
@@ -40,7 +52,12 @@ function DiaryWrite() {
       }, 2000);
     } catch (err) {
       console.error("일기 등록 실패:", err);
-      alert("일기 등록에 실패했습니다.");
+      if (err.status === 409) {
+        alert("해당 날짜에 이미 작성된 일기가 있습니다.");
+        navigate("/diary");
+      } else {
+        alert("일기 등록에 실패했습니다.");
+      }
     }
   };
 
