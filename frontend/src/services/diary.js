@@ -1,6 +1,6 @@
 import axios from "axios";
-const API_DIARY_BASE_URL = "http://localhost:8080/api/diaries";
-const API_ANALYSIS_BASE_URL = "http://localhost:8080/api/analysis";
+const API_DIARY_BASE_URL = import.meta.env.VITE_API_DIARY_BASE_URL;
+const API_ANALYSIS_BASE_URL = import.meta.env.VITE_API_ANALYSIS_BASE_URL;
 
 export const fetchDiaries = async (token) => {
   try {
