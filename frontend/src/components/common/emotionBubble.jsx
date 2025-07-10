@@ -4,11 +4,8 @@ const emotionMap = {
   ANGRY: { color: "#FE4E4E", emoji: "😡" },
   HAPPY: { color: "#FFC548", emoji: "😁" },
   SAD: { color: "#6DD0F0", emoji: "😭" },
-  TENSE: { color: "#634490", emoji: "😯" },
-  nervous: { color: "#F88642", emoji: "😳" },
-  tired: { color: "#008478", emoji: "😫" },
-  bored: { color: "#9747FF", emoji: "🥱" },
-  EMBARR: { color: "#FE76B4", emoji: "😵‍💫" },
+  FEAR: { color: "#F88642", emoji: "😳" },
+  TENDER: { color: "#008478", emoji: "🫠" },
 };
 
 function EmotionBubble({ emotion }) {

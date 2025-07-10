@@ -1,13 +1,18 @@
 import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { fetchDiaryById, deleteDiary } from "../../services/diary";
+import {
+  fetchDiaryById,
+  deleteDiary,
+  fetchAnaylsisById,
+} from "../../services/diary";
 import { getKoreanEmotion } from "../../components/common/emotionDictionary";
 
 function DiaryDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [diary, setDiary] = React.useState(null);
+  const [analysisData, setAnalysisData] = React.useState(null);
   const [loading, setLoading] = React.useState(true);
   const token = localStorage.getItem("token");
   const [analysis, setAnalysis] = React.useState(null);
@@ -16,12 +21,14 @@ function DiaryDetail() {
   React.useEffect(() => {
     const fetchDiary = async () => {
       try {
-        const data = await fetchDiaryById(id);
-        console.log("일기 데이터:", data);
-        setDiary(data);
-        if (data.analysisResult) {
-          setAnalysis(data.analysisResult);
+        const diaryData = await fetchDiaryById(id);
+        setDiary(diaryData);
+        if (diaryData.analysisResult) {
+          setAnalysis(true);
+          const analysisData = await fetchAnaylsisById(id);
+          setAnalysisData(analysisData);
         }
+        console.log("일기 데이터:", diaryData);
       } catch (err) {
         console.error("다이어리 불러오기 실패:", err);
         setDiary(null);
@@ -66,7 +73,10 @@ function DiaryDetail() {
           },
         }
       );
-      setAnalysis(response.data.data);
+      // 분석 완료되었으므로 바로 fetch
+      const analysisData = await fetchAnaylsisById(id);
+      setAnalysis(true);
+      setAnalysisData(analysisData);
     } catch (error) {
       console.error("감정 분석 실패:", error);
       alert("감정 분석에 실패했습니다.");
@@ -156,24 +166,25 @@ function DiaryDetail() {
             </div>
           </div>
 
-          {analysis &&
+          {analysisData &&
             (() => {
-              const emotion = getKoreanEmotion(analysis.domainEmotion);
+              const emotion = getKoreanEmotion(analysisData.domainEmotion);
               return (
                 <div
-                  className="mb-6 p-4 rounded-lg text-gray-800 font-['SejongGeulggot']"
+                  className="mb-4 p-4 rounded-lg text-gray-800 font-noto"
                   style={{ backgroundColor: emotion.color + "CC" }}
                 >
-                  <div className="text-xl mb-2 font-semibold">
-                    감정 분석 결과
-                  </div>
                   <div>
-                    감정: {emotion.label} {emotion.emoji}
+                    감정 분석 결과: {emotion.label} {emotion.emoji}
                   </div>
-                  <div>감정 세기 (dim): {analysis.dim}</div>
                 </div>
               );
             })()}
+          {analysisData && (
+            <div className="mb-6 p-4 rounded-lg bg-black/30 text-gray-800 font-noto text-lg shadow">
+              {analysisData.message}
+            </div>
+          )}
 
           <div className="flex justify-center gap-4">
             <button
