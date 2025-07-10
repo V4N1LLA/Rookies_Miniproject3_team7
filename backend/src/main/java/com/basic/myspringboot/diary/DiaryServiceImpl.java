@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.time.LocalDate;
 
 @Service
 @RequiredArgsConstructor
@@ -53,8 +54,18 @@ public class DiaryServiceImpl implements DiaryService {
         diaryRepository.deleteById(id);
     }
 
-    // ✅ 하루 하나 작성 제약 체크
+    @Override
+    public List<Diary> getDiariesByUserId(Long userId) {
+        return diaryRepository.findByUserIdOrderByTimestampDesc(userId);
+    }
+
     private void checkIfDiaryAlreadyExists(Long userId, LocalDateTime timestamp) {
+        // ✅ 미래 날짜 작성 방지
+        if (timestamp.toLocalDate().isAfter(LocalDate.now())) {
+            throw new IllegalArgumentException("미래 날짜에는 일기를 작성할 수 없습니다.");
+        }
+
+        // ✅ 하루 하나 작성 제약
         LocalDateTime startOfDay = timestamp.toLocalDate().atStartOfDay();
         LocalDateTime endOfDay = startOfDay.plusDays(1).minusNanos(1);
 
@@ -63,4 +74,5 @@ public class DiaryServiceImpl implements DiaryService {
             throw new DuplicateDiaryException("해당 날짜에 이미 작성된 일기가 있습니다.");
         }
     }
+
 }

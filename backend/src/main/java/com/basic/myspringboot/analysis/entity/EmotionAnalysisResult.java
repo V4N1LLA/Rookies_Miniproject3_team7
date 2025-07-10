@@ -1,6 +1,7 @@
 package com.basic.myspringboot.analysis.entity;
 
 import com.basic.myspringboot.diary.Diary;
+import com.basic.myspringboot.message.EncouragementMessage;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
@@ -45,4 +46,8 @@ public class EmotionAnalysisResult {
 
     @OneToOne(mappedBy = "analysisResult", fetch = FetchType.LAZY)
     private Diary diary;
+
+    // ✅ 공감 메시지 연관관계 추가
+    @OneToOne(mappedBy = "analysisResult", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private EncouragementMessage encouragementMessage;
 }

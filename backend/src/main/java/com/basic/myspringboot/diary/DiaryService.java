@@ -8,4 +8,6 @@ public interface DiaryService {
     List<Diary> getAllDiaries();
     Diary getDiaryById(Long id);
     void deleteDiary(Long id);
+
+    List<Diary> getDiariesByUserId(Long userId);
 }

@@ -5,6 +5,8 @@ import com.basic.myspringboot.analysis.dto.EmotionAnalysisResultDto;
 import com.basic.myspringboot.analysis.entity.EmotionAnalysisResult;
 import com.basic.myspringboot.analysis.service.EmotionScoreService;
 import com.basic.myspringboot.analysis.service.EmotionAnalysisService;
+import com.basic.myspringboot.auth.security.UserPrincipal;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import com.basic.myspringboot.common.ApiResponse;
 import com.basic.myspringboot.diary.Diary;
 import com.basic.myspringboot.diary.DiaryService;
@@ -23,7 +25,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/analysis")
-@Tag(name = "감정 분석", description = "감정 분석 및 공감 메시지 API")
+@Tag(name = "감정 분석 및 공감 메세지 생성", description = "감정 분석 및 공감 메시지 생성 API")
 public class EmotionAnalysisController {
 
     private final EmotionAnalysisService analysisService;
@@ -34,7 +36,10 @@ public class EmotionAnalysisController {
 
     @Operation(summary = "일기 감정 분석 및 공감 메시지 생성")
     @PostMapping("/{diaryId}")
-    public ResponseEntity<ApiResponse<?>> analyzeDiary(@PathVariable("diaryId") Long diaryId) {
+    public ResponseEntity<ApiResponse<?>> analyzeDiary(
+            @PathVariable("diaryId") Long diaryId,
+            @AuthenticationPrincipal UserPrincipal userPrincipal) {
+
         Diary diary = diaryService.getDiaryById(diaryId);
 
         if (diary.getAnalysisResult() != null) {
@@ -46,22 +51,30 @@ public class EmotionAnalysisController {
                     .build());
         }
 
-        // 감정 분석
         EmotionAnalysisResult analysisResult = analysisService.analyzeAndSave(diary.getContent());
         diary.setAnalysisResult(analysisResult);
         diaryService.saveDiary(diary);
 
-        // 공감 메시지 생성 및 저장
         String empathyMessage = messageClient.requestMessage(
                 analysisResult.getDomainEmotion(),
                 diary.getContent()
         );
 
+        // 공감 메시지 생성 및 저장
         EncouragementMessage message = EncouragementMessage.builder()
-                .diary(diary)
+                .analysisResult(analysisResult)
                 .emotion(analysisResult.getDomainEmotion())
                 .text(empathyMessage)
+                .diary(diary)
                 .build();
+
+        // 양방향 연관관계 설정
+                diary.setEncouragementMessage(message);
+                analysisResult.setEncouragementMessage(message);
+
+        // 저장
+                encouragementMessageRepository.save(message);
+
         encouragementMessageRepository.save(message);
 
         return ResponseEntity.ok(ApiResponse.builder()
@@ -86,13 +99,14 @@ public class EmotionAnalysisController {
     }
 
     @GetMapping
-    @Operation(summary = "감정 분석 전체 조회")
-    public ApiResponse<List<EmotionAnalysisResultDto>> getAll() {
-        List<EmotionAnalysisResultDto> resultList = analysisService.getAllAnalysisResultDtos();
+    @Operation(summary = "내 감정 분석 결과 전체 조회")
+    public ApiResponse<List<EmotionAnalysisResultDto>> getMyAnalysisResults(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        Long userId = userPrincipal.getId();
+        List<EmotionAnalysisResultDto> resultList = analysisService.getAnalysisResultsByUserId(userId);
 
         return ApiResponse.<List<EmotionAnalysisResultDto>>builder()
                 .success(true)
-                .message("전체 감정 분석 결과 조회 성공")
+                .message("내 감정 분석 결과 조회 성공")
                 .data(resultList)
                 .timestamp(ZonedDateTime.now().toString())
                 .build();
