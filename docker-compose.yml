@@ -17,6 +17,8 @@ services:
       EMOTION_API_URL: http://emotion-api:8000
     depends_on:
       - emotion-api
+    networks:
+      - app-network
 
   emotion-api:
     build:
@@ -31,6 +33,8 @@ services:
       interval: 5s
       timeout: 3s
       retries: 5
+    networks:
+      - app-network
 
   frontend:
     build:
@@ -40,9 +44,12 @@ services:
       - "3000:80"
     depends_on:
       - backend
+    networks:
+      - app-network
 
 volumes:
   db_data:
 
 networks:
   app-network:
+    driver: bridge

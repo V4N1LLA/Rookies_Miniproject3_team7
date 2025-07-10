@@ -4,6 +4,7 @@ import axios from "axios";
 import {
   fetchDiaryById,
   deleteDiary,
+  requestAnalysisById,
   fetchAnaylsisById,
 } from "../../services/diary";
 import { getKoreanEmotion } from "../../components/common/emotionDictionary";
@@ -64,15 +65,7 @@ function DiaryDetail() {
 
     try {
       console.log(name, "의 토큰 :", token);
-      const response = await axios.post(
-        `http://localhost:8080/api/analysis/${id}`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = requestAnalysisById(id);
       // 분석 완료되었으므로 바로 fetch
       const analysisData = await fetchAnaylsisById(id);
       setAnalysis(true);

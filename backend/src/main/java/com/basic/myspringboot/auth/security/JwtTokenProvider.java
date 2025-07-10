@@ -49,6 +49,7 @@ public class JwtTokenProvider {
                 .parseClaimsJws(token);    // 서명·만료 검증
             return true;
         } catch (JwtException | IllegalArgumentException e) {
+
             return false;
         }
     }

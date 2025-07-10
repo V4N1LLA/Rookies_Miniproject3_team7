@@ -2,7 +2,7 @@ package com.basic.myspringboot.diary;
 
 import com.basic.myspringboot.analysis.entity.EmotionAnalysisResult;
 import com.basic.myspringboot.analysis.service.EmotionAnalysisService;
-import com.basic.myspringboot.diary.exception.DuplicateDiaryException;
+import com.basic.myspringboot.diary.DuplicateDiaryException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

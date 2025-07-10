@@ -1,6 +1,7 @@
 // src/pages/auth/Signup.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { signup } from "../../services/auth";
 
 export default function Signup() {
   const [email, setEmail] = useState("");
@@ -12,22 +13,11 @@ export default function Signup() {
     e.preventDefault();
 
     try {
-      const res = await fetch("http://localhost:8080/api/auth/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, name, password }),
-      });
-
-      if (res.ok) {
-        alert("회원가입이 완료되었습니다!");
-        navigate("/login");
-      } else {
-        alert("회원가입에 실패했습니다.");
-      }
+      const resBody = await signup(email, name, password);
+      alert("회원가입이 완료되었습니다!");
+      navigate("/login");
     } catch (error) {
-      alert("회원가입 중 오류 발생");
+      alert("회원가입에 실패했습니다.");
       console.error(error);
     }
   };
@@ -37,11 +27,11 @@ export default function Signup() {
       <div className="bg-[#F5F5F5] w-[360px] rounded-2xl shadow-xl p-8 border border-gray-300 font-['SejongGeulggot']">
         {/* 감정/날씨 아이콘 */}
         <div className="flex justify-around items-center mb-6 border-b border-gray-300 pb-4">
-          <img src="public/icons/sun.svg" alt="sun" className="w-6 h-6" />
-          <img src="public/icons/cloud rain.svg" alt="cloud" className="w-6 h-6" />
-          <img src="public/icons/sun.svg" alt="sun" className="w-6 h-6" />
-          <img src="public/icons/cloud rain.svg" alt="rain" className="w-6 h-6" />
-          <img src="public/icons/cloud rain.svg" alt="rain" className="w-6 h-6" />
+          <img src="/icons/sun.svg" alt="sun" className="w-6 h-6" />
+          <img src="/icons/cloud rain.svg" alt="cloud" className="w-6 h-6" />
+          <img src="/icons/sun.svg" alt="sun" className="w-6 h-6" />
+          <img src="/icons/cloud rain.svg" alt="rain" className="w-6 h-6" />
+          <img src="/icons/cloud rain.svg" alt="rain" className="w-6 h-6" />
         </div>
 
         <h2 className="text-center text-xl font-bold mb-4">회원가입</h2>

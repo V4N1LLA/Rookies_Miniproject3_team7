@@ -2,7 +2,7 @@ package com.basic.myspringboot.diary;
 
 import com.basic.myspringboot.analysis.entity.EmotionAnalysisResult;
 import com.basic.myspringboot.analysis.service.EmotionAnalysisService;
-import com.basic.myspringboot.diary.exception.DuplicateDiaryException;
+import com.basic.myspringboot.diary.DuplicateDiaryException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import com.basic.myspringboot.auth.security.UserPrincipal;
 import io.swagger.v3.oas.annotations.Operation;

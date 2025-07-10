@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Toast } from "../../components/common/Alert";
+import { login } from "../../services/auth";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -12,31 +13,19 @@ export default function Login() {
     e.preventDefault();
 
     try {
-      const res = await fetch("http://localhost:8080/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
+      const resBody = await login(email, password);
+      const { token, user } = resBody.data;
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user));
+      console.log("토큰:", token);
+      setShowToast(true);
 
-      if (res.ok) {
-        const resBody = await res.json();
-        const { token, user } = resBody.data;
-        localStorage.setItem("token", token);
-        localStorage.setItem("user", JSON.stringify(user));
-        console.log("토큰:", token);
-        setShowToast(true);
-
-        setTimeout(() => {
-          setShowToast(false);
-          navigate(`/diary`);
-        }, 1000);
-      } else {
-        alert("이메일 또는 비밀번호가 올바르지 않습니다.");
-      }
+      setTimeout(() => {
+        setShowToast(false);
+        navigate(`/diary`);
+      }, 1000);
     } catch (error) {
-      alert("로그인 중 오류가 발생했습니다.");
+      alert(error.message || "로그인 중 오류가 발생했습니다.");
       console.error(error);
     }
   };
@@ -46,20 +35,16 @@ export default function Login() {
       <div className="bg-[#F5F5F5] w-[360px] rounded-2xl shadow-xl p-8 border border-gray-300 font-['SejongGeulggot'] mx-auto">
         {/* 감정/날씨 아이콘 */}
         <div className="flex justify-around items-center mb-6 border-b border-gray-300 pb-4">
-          <img src="public/icons/sun.svg" alt="sun" className="w-6 h-6" />
+          <img src="/icons/sun.svg" alt="sun" className="w-6 h-6" />
+          <img src="/icons/cloud rain.svg" alt="cloud" className="w-6 h-6" />
+          <img src="/icons/sun.svg" alt="rain" className="w-6 h-6" />
           <img
-            src="public/icons/cloud rain.svg"
-            alt="cloud"
-            className="w-6 h-6"
-          />
-          <img src="public/icons/sun.svg" alt="rain" className="w-6 h-6" />
-          <img
-            src="public/icons/cloud rain.svg"
+            src="/icons/cloud rain.svg"
             alt="heavy rain"
             className="w-6 h-6"
           />
           <img
-            src="public/icons/cloud rain.svg"
+            src="/icons/cloud rain.svg"
             alt="heavy rain"
             className="w-6 h-6"
           />

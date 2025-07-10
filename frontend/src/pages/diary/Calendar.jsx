@@ -29,7 +29,7 @@ function Calendar() {
     const token = localStorage.getItem("token");
     setLoading(true);
 
-    fetchDiaries(token)
+    fetchDiaries()
       .then((entries) => {
         const dates = entries.map((entry) => ({
           date: entry.timestamp.slice(0, 10),
