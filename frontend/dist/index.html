@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="./logo.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="Web site created using Vite + React" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="manifest" href="./manifest.json" />
+    <title>Moodiary</title>
+    <script type="module" crossorigin src="./assets/index-DYfUBjrw.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-DTGWUlNv.css">
+  </head>
+  <body>
+    <script>
+      function getRandomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+      }
+
+      function generateDotPattern() {
+        const colors = [
+          "#6dd0f0",
+          "#fe76b4",
+          "#ffc548",
+          "#9747ff",
+          "#008478",
+          "#fe4e4e",
+          "#634490",
+        ];
+
+        const dotContainer = document.createElement("div");
+        dotContainer.style.position = "fixed";
+        dotContainer.style.top = "0";
+        dotContainer.style.left = "0";
+        dotContainer.style.width = "100%";
+        dotContainer.style.height = "100%";
+        dotContainer.style.zIndex = "-1";
+        dotContainer.style.overflow = "hidden";
+
+        for (let i = 0; i < 100; i++) {
+          const dot = document.createElement("div");
+          const size = getRandomInt(4, 10);
+          dot.style.width = `${size}px`;
+          dot.style.height = `${size}px`;
+          dot.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+          dot.style.borderRadius = "50%";
+          dot.style.position = "absolute";
+          dot.style.top = `${getRandomInt(0, 100)}%`;
+          dot.style.left = `${getRandomInt(0, 100)}%`;
+          dotContainer.appendChild(dot);
+        }
+
+        document.body.appendChild(dotContainer);
+      }
+
+      document.addEventListener("DOMContentLoaded", generateDotPattern);
+    </script>
+
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+  </body>
+</html>
