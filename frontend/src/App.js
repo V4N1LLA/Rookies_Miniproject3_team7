@@ -12,7 +12,7 @@ import Header from "./components/layout/Header";
 
 function App() {
   return (
-    <div className="min-h-screen bg-emotion-dots">
+    <div className="min-h-screen bg-emotion-dots p-[30px]">
       <Router>
         <Header></Header>
         <Routes>
