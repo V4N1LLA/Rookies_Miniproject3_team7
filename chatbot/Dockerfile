@@ -7,6 +7,8 @@ WORKDIR /app
 # Copy files
 COPY requirements.txt .
 COPY app.py .
+COPY faiss_index.py ./
+
 
 # Install dependencies
 RUN pip install --upgrade pip

@@ -1,10 +1,18 @@
 package com.basic.myspringboot.service;
 
+import java.util.List;
+import com.basic.myspringboot.dto.ChatHistoryResponse;
 import com.basic.myspringboot.entity.*;
 import com.basic.myspringboot.repository.*;
 import com.basic.myspringboot.service.VectorDbClient;
+
+import jakarta.persistence.EntityNotFoundException;
+
 import com.basic.myspringboot.service.LangServeClient;
 import lombok.RequiredArgsConstructor;
+
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +32,11 @@ public class ChatService {
         return chatSessionRepository.save(session);
     }
 
+    public ChatSession getSessionById(Long id) {
+        return chatSessionRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Session not found with id: " + id));
+    }
+
     public ChatMessage saveMessage(Long sessionId, String sender, String content, String jwtToken) {
         ChatSession session = chatSessionRepository.findById(sessionId)
                 .orElseThrow(() -> new IllegalArgumentException("Session not found"));
@@ -38,7 +51,7 @@ public class ChatService {
         session.addMessage(saved);
 
         // ✅ Vector DB 저장 예시 코드
-        vectorDbClient.saveEmbedding(saved.getId(), content, 1536,"neutral", jwtToken);
+        vectorDbClient.saveEmbedding(saved.getId(), content, 1536, "neutral", jwtToken);
 
         return saved;
     }
@@ -55,6 +68,26 @@ public class ChatService {
         message.setFeedback(feedback);
 
         return feedbackRepository.save(feedback);
+    }
+
+    public ChatHistoryResponse getHistory(Long userId) {
+        ChatSession session = chatSessionRepository.findByUserId(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Session not found for userId: " + userId));
+
+        List<ChatHistoryResponse.ChatHistoryItem> historyItems = chatMessageRepository
+                .findByChatSessionId(session.getId())
+                .stream()
+                .map(message -> ChatHistoryResponse.ChatHistoryItem.builder()
+                        .userMessage(message.getSender().equals("user") ? message.getContent() : "")
+                        .aiResponse(message.getSender().equals("ai") ? message.getContent() : "")
+                        .timestamp(message.getCreatedAt().toString())
+                        .build())
+                .collect(Collectors.toList());
+
+        return ChatHistoryResponse.builder()
+                .userId(userId)
+                .history(historyItems)
+                .build();
     }
 
     public String generateBotResponse(String prompt) {

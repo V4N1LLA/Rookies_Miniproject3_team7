@@ -1,5 +1,6 @@
 package com.basic.myspringboot.controller;
 
+import java.util.List;
 import com.basic.myspringboot.dto.*;
 import com.basic.myspringboot.entity.*;
 import com.basic.myspringboot.service.ChatService;
@@ -22,13 +23,17 @@ public class ChatController {
         return ResponseEntity.ok(ApiResponse.success(session.getId(), "세션이 생성되었습니다."));
     }
 
-    @PostMapping("/chat/{sessionId}/message")
-    public ResponseEntity<ApiResponse<ChatMessageResponse>> sendMessage(@PathVariable Long sessionId,
+    @PostMapping("/chat")
+    public ResponseEntity<ApiResponse<ChatMessageResponse>> sendMessage(
             @RequestBody ChatMessageRequest request,
             @RequestHeader("Authorization") String authorization) {
         String jwtToken = authorization.replace("Bearer ", "");
 
-        ChatMessage message = chatService.saveMessage(sessionId, request.getSender(), request.getContent(), jwtToken);
+        ChatMessage message = chatService.saveMessage(
+            request.getSessionId(),
+            request.getSender(),
+            request.getContent(),
+            jwtToken);
 
         ChatMessageResponse response = ChatMessageResponse.builder()
                 .messageId(message.getId())
@@ -50,6 +55,12 @@ public class ChatController {
         ApiResponse<Long> response = ApiResponse.success(messageId, "피드백이 성공적으로 등록되었습니다.", feedback.getFeedback());
 
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/chat/history")
+    public ResponseEntity<ApiResponse<ChatHistoryResponse>> getHistory(@RequestParam Long userId) {
+        ChatHistoryResponse history = chatService.getHistory(userId);
+        return ResponseEntity.ok(ApiResponse.success(history, "히스토리 조회 성공"));
     }
 
 }
