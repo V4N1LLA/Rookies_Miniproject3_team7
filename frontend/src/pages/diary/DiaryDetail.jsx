@@ -52,9 +52,13 @@ function DiaryDetail() {
 
   const handleAnalysis = async () => {
     setAnalyzing(true);
+    const token = localStorage.getItem("token");
+    const name = localStorage.getItem("user");
+
     try {
+      console.log(name, "의 토큰 :", token);
       const response = await axios.post(
-        `http://localhost:8080/api/diaries/${id}/analyze`,
+        `http://localhost:8080/api/analysis/${id}`,
         {},
         {
           headers: {
