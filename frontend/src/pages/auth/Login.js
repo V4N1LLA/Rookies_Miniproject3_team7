@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Toast from "../../components/common/Alert";
+import { Toast } from "../../components/common/Alert";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -21,8 +21,11 @@ export default function Login() {
       });
 
       if (res.ok) {
-        const data = await res.json();
-        localStorage.setItem("token", data.token);
+        const resBody = await res.json();
+        const { token, user } = resBody.data;
+        localStorage.setItem("token", token);
+        localStorage.setItem("user", JSON.stringify(user));
+        console.log("토큰:", token);
         setShowToast(true);
 
         setTimeout(() => {

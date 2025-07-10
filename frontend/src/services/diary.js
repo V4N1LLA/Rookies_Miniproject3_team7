@@ -1,8 +1,7 @@
 import axios from "axios";
-const token = localStorage.getItem("token");
 const API_BASE_URL = "http://localhost:8080/api/diaries";
 
-export const fetchDiaries = async () => {
+export const fetchDiaries = async (token) => {
   try {
     const response = await axios.get(API_BASE_URL, {
       headers: {
@@ -16,6 +15,7 @@ export const fetchDiaries = async () => {
 };
 
 export const createDiary = async (diary) => {
+  const token = localStorage.getItem("token");
   try {
     const response = await axios.post(API_BASE_URL, diary, {
       headers: {
@@ -29,6 +29,8 @@ export const createDiary = async (diary) => {
 };
 
 export const fetchDiaryById = async (id) => {
+  const token = localStorage.getItem("token");
+
   try {
     const response = await axios.get(`${API_BASE_URL}/${id}`, {
       headers: {
@@ -42,6 +44,8 @@ export const fetchDiaryById = async (id) => {
 };
 
 export const deleteDiary = async (id) => {
+  const token = localStorage.getItem("token");
+
   try {
     const response = await axios.delete(`${API_BASE_URL}/${id}`, {
       headers: {

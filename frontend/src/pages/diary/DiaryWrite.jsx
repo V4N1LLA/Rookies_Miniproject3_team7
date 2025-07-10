@@ -2,7 +2,7 @@ import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "../../index.css"; // bg-paper가 정의되어 있는 CSS
 import axios from "axios";
-import Toast from "../../components/common/Alert";
+import {Toast} from "../../components/common/Alert";
 import { createDiary } from "../../services/diary";
 
 function DiaryWrite() {
@@ -15,7 +15,7 @@ function DiaryWrite() {
   const [title, setTitle] = React.useState("");
   const [content, setContent] = React.useState("");
   const [showToast, setShowToast] = React.useState(false);
-
+  const token = localStorage.getItem("token");
   const handleBack = () => {
     navigate("/diary");
   };
@@ -28,7 +28,7 @@ function DiaryWrite() {
     try {
       // 중복 일기 체크
       const fetchDiaries = (await import("../../services/diary")).fetchDiaries;
-      const existingDiaries = await fetchDiaries();
+      const existingDiaries = await fetchDiaries(token);
       const isDuplicate = existingDiaries.some(
         (entry) => entry.timestamp.slice(0, 10) === date
       );

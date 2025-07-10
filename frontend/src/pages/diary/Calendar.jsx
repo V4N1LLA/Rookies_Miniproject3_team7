@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { fetchDiaries } from "../../services/diary";
 import { ChevronRightIcon } from "@heroicons/react/24/solid";
 import { ChevronLeftIcon } from "@heroicons/react/24/solid";
+import { LoadingToast } from "../../components/common/Alert";
 
 function getDaysInMonth(year, month) {
   return new Date(year, month, 0).getDate();
@@ -23,10 +24,12 @@ function Calendar() {
   const { year, month, setYear, setMonth } = useCalendarStore();
   const navigate = useNavigate();
   const [diaryDates, setDiaryDates] = useState([]);
-  const token = localStorage.getItem("token");
-
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
-    fetchDiaries()
+    const token = localStorage.getItem("token");
+    setLoading(true);
+
+    fetchDiaries(token)
       .then((entries) => {
         const dates = entries.map((entry) => ({
           date: entry.timestamp.slice(0, 10),
@@ -35,7 +38,12 @@ function Calendar() {
         }));
         setDiaryDates(dates);
       })
-      .catch((err) => console.error("다이어리 로딩 실패:", err));
+      .catch((err) => {
+        console.error("다이어리 로딩 실패:", err);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, []);
 
   const changeMonth = (increment) => {
@@ -72,7 +80,9 @@ function Calendar() {
   ];
 
   return (
-    <div className="min-h-screen flex justify-center items-center">
+    <>
+      {loading && <LoadingToast message="다이어리 불러오는 중..." />}
+      <div className="min-h-screen flex justify-center items-center">
       <div className="w-full max-w-5xl relative">
         <div className="h-[30px] bg-[#F5C451] rounded-t-2xl shadow-[0_4px_4px_rgba(0,0,0,0.25)] absolute top-0 left-0 right-0 z-30 " />
         <div className="bg-paper pt-[60px] max-w-5xl bg-white/70 shadow-md rounded-b-xl p-10 relative">
@@ -144,8 +154,9 @@ function Calendar() {
             })}
           </div>
         </div>
-      </div>{" "}
-    </div>
+        </div>
+      </div>
+    </>
   );
 }
 

@@ -14,4 +14,12 @@ function Toast({ message, onClose }) {
   );
 }
 
-export default Toast;
+function LoadingToast({ message = "로딩중 ..." }) {
+  return (
+    <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-black/80 text-white px-6 py-3 rounded-lg shadow-lg z-50 font-['SejongGeulggot'] text-[16px] animate-fadeInUp">
+      {message}
+    </div>
+  );
+}
+
+export { Toast, LoadingToast };
