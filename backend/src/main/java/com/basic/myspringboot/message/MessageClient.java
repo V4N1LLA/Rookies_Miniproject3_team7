@@ -31,12 +31,12 @@ public class MessageClient {
         );
 
         return webClient.post()
-                .uri("/api/message")
+                .uri("/api/empathy")
                 .bodyValue(requestBody)
                 .retrieve()
                 .bodyToMono(MessageResponse.class)
                 .map(MessageResponse::getMessage)
-                .onErrorReturn("공감 메시지 생성 실패")  // ✅ 예외 처리 기본 메시지
+                .onErrorReturn("공감 메시지 생성 실패")
                 .block();
     }
 

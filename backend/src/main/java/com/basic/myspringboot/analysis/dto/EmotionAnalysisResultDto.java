@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @Builder
@@ -20,6 +22,7 @@ public class EmotionAnalysisResultDto {
     private LocalDateTime createdAt;
     private String message;
     private Long diaryId;
+    private List<EmotionScoreDto> scores;
 
     public static EmotionAnalysisResultDto from(EmotionAnalysisResult entity) {
         String messageText = null;
@@ -28,7 +31,7 @@ public class EmotionAnalysisResultDto {
         if (entity.getDiary() != null) {
             diaryId = entity.getDiary().getDiaryId();
 
-            // Lazy 로딩 강제 초기화
+            // 공감 메시지 Lazy 로딩 강제 접근
             if (entity.getDiary().getEncouragementMessage() != null) {
                 messageText = entity.getDiary().getEncouragementMessage().getText();
             }
@@ -41,6 +44,11 @@ public class EmotionAnalysisResultDto {
                 .createdAt(entity.getCreatedAt())
                 .message(messageText)
                 .diaryId(diaryId)
+                //.scores(
+                //        entity.getScores().stream()
+                //                .map(EmotionScoreDto::fromEntity)
+                //                .collect(Collectors.toList())
+                //)
                 .build();
     }
 }

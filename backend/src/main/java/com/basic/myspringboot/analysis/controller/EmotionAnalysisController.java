@@ -1,7 +1,9 @@
 package com.basic.myspringboot.analysis.controller;
 
+import com.basic.myspringboot.analysis.dto.EmotionScoreDto;
 import com.basic.myspringboot.analysis.dto.EmotionAnalysisResultDto;
 import com.basic.myspringboot.analysis.entity.EmotionAnalysisResult;
+import com.basic.myspringboot.analysis.service.EmotionScoreService;
 import com.basic.myspringboot.analysis.service.EmotionAnalysisService;
 import com.basic.myspringboot.common.ApiResponse;
 import com.basic.myspringboot.diary.Diary;
@@ -25,6 +27,7 @@ import java.util.List;
 public class EmotionAnalysisController {
 
     private final EmotionAnalysisService analysisService;
+    private final EmotionScoreService emotionScoreService;
     private final DiaryService diaryService;
     private final MessageClient messageClient;
     private final EncouragementMessageRepository encouragementMessageRepository;
@@ -61,7 +64,6 @@ public class EmotionAnalysisController {
                 .build();
         encouragementMessageRepository.save(message);
 
-        // 응답 반환
         return ResponseEntity.ok(ApiResponse.builder()
                 .success(true)
                 .message("감정 분석 및 공감 메시지 생성 완료")
@@ -94,5 +96,13 @@ public class EmotionAnalysisController {
                 .data(resultList)
                 .timestamp(ZonedDateTime.now().toString())
                 .build();
+    }
+
+    @GetMapping("/{diaryId}/scores")
+    @Operation(summary = "일기 ID로 감정 분석 점수 결과 조회")
+    public ResponseEntity<List<EmotionScoreDto>> getEmotionScores(@PathVariable Long diaryId) {
+        Long analysisId = diaryService.getDiaryById(diaryId).getAnalysisResult().getAnalysisId();
+        List<EmotionScoreDto> scores = emotionScoreService.findByAnalysisId(analysisId);
+        return ResponseEntity.ok(scores);
     }
 }

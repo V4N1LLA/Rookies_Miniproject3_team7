@@ -1,25 +1,18 @@
-import sys
 import os
+import sys
+
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
-from typing import List, Dict
-from datetime import datetime
+from fastapi import FastAPI
 from dotenv import load_dotenv
-
-from api.empathy_api import router as empathy_router
-from analysis.emotion_analyzer import analyze_emotion
-
-# ✅ OpenAI SDK 유효성 검사용
 from openai import OpenAI, AuthenticationError
-
-# ✅ Swagger 문서용
-from fastapi.openapi.utils import get_openapi
 from fastapi.openapi.docs import get_swagger_ui_html
 from fastapi.responses import HTMLResponse
-from fastapi.openapi.models import Contact
 
+# ✅ 분리된 라우터만 import
+from api.empathy_api import router as emotion_router
+
+# ✅ .env 로드
 load_dotenv()
 
 app = FastAPI(
@@ -32,59 +25,28 @@ app = FastAPI(
     }
 )
 
-# ✅ 공감 메시지 라우터 등록
-app.include_router(empathy_router)
+# ✅ 통합 라우터 등록 (/api/emotion, /api/empathy, /api/full)
+app.include_router(emotion_router)
 
-# ✅ OpenAI API Key 유효성 검사
+# ✅ OpenAI API Key 유효성 검사 (없으면 테스트 환경으로 우회)
 @app.on_event("startup")
 def validate_openai_key():
     api_key = os.getenv("OPENAI_API_KEY")
-    if not api_key:
-        raise RuntimeError("❌ .env 파일에 OPENAI_API_KEY가 설정되어 있지 않습니다.")
+
+    if not api_key or api_key.startswith("sk-proj-") and len(api_key) < 40:
+        print("⚠️ OPENAI_API_KEY 없음 또는 비정상 - 테스트 환경으로 실행됨")
+        return
+
     try:
         client = OpenAI(api_key=api_key)
         _ = client.models.list()
         print("✅ OpenAI API Key 유효성 검사 통과")
     except AuthenticationError:
-        raise RuntimeError("❌ OpenAI API Key가 유효하지 않습니다.")
+        print("❌ OpenAI Key 인증 실패 - 테스트 환경으로 우회")
     except Exception as e:
-        raise RuntimeError(f"OpenAI API Key 검사 중 오류 발생: {e}")
+        print(f"❌ OpenAI 검사 중 오류 - {e} → 테스트 환경으로 우회")
 
-
-# 📌 감정 분석 요청 형식
-class EmotionRequest(BaseModel):
-    content: str
-
-
-# 📌 감정 분석 응답 형식
-class EmotionResponse(BaseModel):
-    domain_emotion: str
-    scores: Dict[str, float]
-    vector: List[float]
-    dim: int
-    encouragement_message: str  # ✅ 현재는 빈 문자열로 반환됨
-    created_at: datetime
-
-
-# ✅ 감정 분석 API (공감 메시지는 제거됨)
-@app.post("/analyze", response_model=EmotionResponse, tags=["감정 분석"])
-async def analyze(request: EmotionRequest):
-    try:
-        emotion_result = analyze_emotion(request.content)
-
-        return EmotionResponse(
-            domain_emotion=emotion_result["top_emotion"],
-            scores=emotion_result["scores"],
-            vector=emotion_result["vector"],
-            dim=emotion_result["dim"],
-            encouragement_message="",  # ✅ 이제는 공감 메시지 X
-            created_at=emotion_result["created_at"]
-        )
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-# ✅ Swagger Docs 커스텀 라우팅 (선택사항)
+# ✅ Swagger Docs 커스텀 경로
 @app.get("/docs", include_in_schema=False)
 async def custom_swagger_ui():
     return get_swagger_ui_html(openapi_url="/openapi.json", title="API 문서")
