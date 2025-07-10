@@ -72,7 +72,7 @@ function Calendar() {
   ];
 
   return (
-    <div className="min-h-screen flex justify-center items-center py-12 px-4">
+    <div className="min-h-screen flex justify-center items-center">
       <div className="w-full max-w-5xl relative">
         <div className="h-[30px] bg-[#F5C451] rounded-t-2xl shadow-[0_4px_4px_rgba(0,0,0,0.25)] absolute top-0 left-0 right-0 z-30 " />
         <div className="bg-paper pt-[60px] max-w-5xl bg-white/70 shadow-md rounded-b-xl p-10 relative">
