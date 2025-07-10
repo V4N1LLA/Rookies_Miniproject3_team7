@@ -33,8 +33,8 @@ function Calendar() {
       .then((entries) => {
         const dates = entries.map((entry) => ({
           date: entry.timestamp.slice(0, 10),
-          id: entry.diaryId,
-          emotion: entry.analysisResult?.domainEmotion,
+          id: entry.diary_id,
+          emotion: entry.analysis_result?.domain_emotion,
         }));
         setDiaryDates(dates);
       })
@@ -144,7 +144,7 @@ function Calendar() {
                       {hasDiary && (
                         <div className="absolute w-full h-full flex items-center justify-center">
                           <EmotionBubble
-                            emotion={diaryEntry.emotion?.toLowerCase()}
+                            emotion={diaryEntry.emotion?.toUpperCase()}
                           />
                         </div>
                       )}
