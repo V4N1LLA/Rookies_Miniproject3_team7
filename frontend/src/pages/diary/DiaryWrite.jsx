@@ -2,7 +2,7 @@ import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "../../index.css"; // bg-paper가 정의되어 있는 CSS
 import axios from "axios";
-import {Toast} from "../../components/common/Alert";
+import { Toast, LoadingToast } from "../../components/common/Alert";
 import { createDiary } from "../../services/diary";
 
 function DiaryWrite() {
@@ -15,6 +15,7 @@ function DiaryWrite() {
   const [title, setTitle] = React.useState("");
   const [content, setContent] = React.useState("");
   const [showToast, setShowToast] = React.useState(false);
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
   const token = localStorage.getItem("token");
   const handleBack = () => {
     navigate("/diary");
@@ -24,6 +25,8 @@ function DiaryWrite() {
       alert("제목, 내용을 모두 입력해주세요.");
       return;
     }
+
+    setIsSubmitting(true);
 
     try {
       // 중복 일기 체크
@@ -49,6 +52,7 @@ function DiaryWrite() {
       setTimeout(() => {
         setShowToast(false);
         navigate(`/diary`);
+        setIsSubmitting(false);
       }, 2000);
     } catch (err) {
       console.error("일기 등록 실패:", err);
@@ -57,6 +61,7 @@ function DiaryWrite() {
         navigate("/diary");
       } else {
         alert("일기 등록에 실패했습니다.");
+        setIsSubmitting(false);
       }
     }
   };
@@ -123,6 +128,9 @@ function DiaryWrite() {
           message="일기가 등록되었습니다!"
           onClose={() => setShowToast(false)}
         />
+      )}
+      {isSubmitting && !showToast && (
+        <LoadingToast message="일기 등록 중입니다..." />
       )}
     </div>
   );
