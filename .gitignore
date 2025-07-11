@@ -1,50 +1,51 @@
-HELP.md
-backend/target/
-!.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
-
-# Ignore environment config
-.env
-application-local.yml
-
-# Java / Spring Boot
-/target
+# =============== Java & Maven ===============
+/target/
 *.class
 *.jar
+*.jar.original
 *.war
 *.log
 
-### STS ###
+# =============== 환경설정 파일 ===============
+.env
+application-local.yml
+
+# =============== IDE 설정 무시 ===============
+
+# STS (Spring Tool Suite)
 .apt_generated
 .classpath
 .factorypath
 .project
-.settings
+.settings/
 .springBeans
 .sts4-cache
 
-### IntelliJ IDEA ###
-.idea
+# IntelliJ IDEA
+.idea/
 *.iws
 *.iml
 *.ipr
 
-### NetBeans ###
+# VS Code
+.vscode/
+
+# NetBeans
 /nbproject/private/
 /nbbuild/
 /dist/
 /nbdist/
 /.nb-gradle/
+
+# =============== 빌드 디렉토리 ===============
 build/
-!**/src/main/**/build/
-!**/src/test/**/build/
 
-### VS Code ###
-.vscode/
-
-# OS
+# =============== 운영체제 파일 ===============
 .DS_Store
 Thumbs.db
 
+# =============== Python ===============
 python-emotion-api/venv/
+python-emotion-api/.venv/
+__pycache__/
+*.pyc
