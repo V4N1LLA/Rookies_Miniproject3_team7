@@ -87,7 +87,7 @@ export const requestAnalysisById = async (id) => {
         },
       }
     );
-    return response.data;
+    return response;
   } catch (error) {
     throw error.response?.data || error;
   }

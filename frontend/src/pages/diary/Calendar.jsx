@@ -1,6 +1,6 @@
 import React from "react";
 import { useCalendarStore } from "../../store/calendarStore";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import "../../index.css";
 import EmotionBubble from "../../components/common/emotionBubble";
 import { useEffect, useState } from "react";
@@ -8,6 +8,7 @@ import { fetchDiaries } from "../../services/diary";
 import { ChevronRightIcon } from "@heroicons/react/24/solid";
 import { ChevronLeftIcon } from "@heroicons/react/24/solid";
 import { LoadingToast } from "../../components/common/Alert";
+import { diaryStore } from "../../store/diaryStore";
 
 function getDaysInMonth(year, month) {
   return new Date(year, month, 0).getDate();
@@ -23,6 +24,7 @@ function isFutureDate(year, month, day) {
 function Calendar() {
   const { year, month, setYear, setMonth } = useCalendarStore();
   const navigate = useNavigate();
+  const location = useLocation();
   const [diaryDates, setDiaryDates] = useState([]);
   const [loading, setLoading] = useState(false);
   useEffect(() => {
@@ -44,7 +46,7 @@ function Calendar() {
       .finally(() => {
         setLoading(false);
       });
-  }, []);
+  }, [location.pathname]);
 
   const changeMonth = (increment) => {
     const newMonth = month + increment;
