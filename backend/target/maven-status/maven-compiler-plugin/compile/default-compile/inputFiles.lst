@@ -1,0 +1,17 @@
+C:\mybackend\Rookies_Miniproject3_team7\backend\src\main\java\com\basic\myspringboot\config\RestTemplateConfig.java
+C:\mybackend\Rookies_Miniproject3_team7\backend\src\main\java\com\basic\myspringboot\controller\ChatController.java
+C:\mybackend\Rookies_Miniproject3_team7\backend\src\main\java\com\basic\myspringboot\dto\ApiResponse.java
+C:\mybackend\Rookies_Miniproject3_team7\backend\src\main\java\com\basic\myspringboot\dto\ChatHistoryResponse.java
+C:\mybackend\Rookies_Miniproject3_team7\backend\src\main\java\com\basic\myspringboot\dto\ChatMessageRequest.java
+C:\mybackend\Rookies_Miniproject3_team7\backend\src\main\java\com\basic\myspringboot\dto\ChatMessageResponse.java
+C:\mybackend\Rookies_Miniproject3_team7\backend\src\main\java\com\basic\myspringboot\dto\FeedbackRequest.java
+C:\mybackend\Rookies_Miniproject3_team7\backend\src\main\java\com\basic\myspringboot\entity\ChatMessage.java
+C:\mybackend\Rookies_Miniproject3_team7\backend\src\main\java\com\basic\myspringboot\entity\ChatSession.java
+C:\mybackend\Rookies_Miniproject3_team7\backend\src\main\java\com\basic\myspringboot\entity\Feedback.java
+C:\mybackend\Rookies_Miniproject3_team7\backend\src\main\java\com\basic\myspringboot\MySpringBootAppApplication.java
+C:\mybackend\Rookies_Miniproject3_team7\backend\src\main\java\com\basic\myspringboot\repository\ChatMessageRepository.java
+C:\mybackend\Rookies_Miniproject3_team7\backend\src\main\java\com\basic\myspringboot\repository\ChatSessionRepository.java
+C:\mybackend\Rookies_Miniproject3_team7\backend\src\main\java\com\basic\myspringboot\repository\FeedbackRepository.java
+C:\mybackend\Rookies_Miniproject3_team7\backend\src\main\java\com\basic\myspringboot\service\ChatService.java
+C:\mybackend\Rookies_Miniproject3_team7\backend\src\main\java\com\basic\myspringboot\service\LangServeClient.java
+C:\mybackend\Rookies_Miniproject3_team7\backend\src\main\java\com\basic\myspringboot\service\VectorDbClient.java

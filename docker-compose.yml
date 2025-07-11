@@ -1,14 +1,47 @@
-version: "3.8"
+version: '3.8'
 
 services:
-  springboot-app:
-    build: ./backend
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend
     ports:
       - "8080:8080"
+    env_file:
+      - .env  # ✅ 외부 DB 정보 (.env 파일에서 가져옴)
     environment:
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
-    networks:
-      - moodiary-net
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      EMOTION_API_URL: http://emotion-api:8000
+    depends_on:
+      - emotion-api
+
+  emotion-api:
+    build:
+      context: ./python-emotion-api
+    container_name: emotion-api
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./python-emotion-api/.env  # ✅ 필요시 감정 API 환경변수
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/docs"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+# frontend:
+#   build:
+#     context: ./frontend
+#   container_name: frontend
+#   ports:
+#     - "3000:80"
+#   depends_on:
+#     - backend
+#   networks:
+#     - app-network
 
   fastapi-chatbot:
     build: ./chatbot
@@ -19,9 +52,9 @@ services:
     volumes:
       - faiss_volume:/app/faiss_data
     networks:
-      - moodiary-net
+      - app-network
 volumes:
   faiss_volume:
   
 networks:
-  moodiary-net:
+  app-network:
