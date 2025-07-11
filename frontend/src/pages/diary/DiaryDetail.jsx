@@ -7,6 +7,7 @@ import {
   deleteDiary,
   requestAnalysisById,
   fetchAnaylsisById,
+  fetchEmotionScores,
 } from "../../services/diary";
 import { getKoreanEmotion } from "../../components/common/emotionDictionary";
 import { diaryStore } from "../../store/diaryStore";
@@ -18,6 +19,7 @@ function DiaryDetail() {
   const [loading, setLoading] = useState(true);
   const [diary, setDiary] = useState(null);
   const [analyzing, setAnalyzing] = React.useState(false);
+  const [emotionScores, setEmotionScores] = useState([]);
   const token = localStorage.getItem("token");
 
   React.useEffect(() => {
@@ -39,6 +41,8 @@ function DiaryDetail() {
         ) {
           const result = await fetchAnaylsisById(id);
           store.setAnalysisDataFor(id, result);
+          const scores = await fetchEmotionScores(id);
+          setEmotionScores(scores);
           store.setAnalysisFor(id, true);
         }
       } catch (err) {
@@ -207,6 +211,18 @@ function DiaryDetail() {
           {analysisData && (
             <div className="mb-6 p-4 rounded-lg bg-black/30 text-gray-800 font-noto text-lg shadow">
               {analysisData.message}
+            </div>
+          )}
+          {emotionScores.length > 0 && (
+            <div className="mb-6 p-4 rounded-lg bg-black/10 text-gray-800 font-noto text-lg shadow">
+              <h3 className="text-xl mb-2 font-bold">감정 분석 점수</h3>
+              <ul className="list-disc list-inside">
+                {emotionScores.map((score, idx) => (
+                  <li key={idx}>
+                    {getKoreanEmotion(score.code).label} {getKoreanEmotion(score.code).emoji}: {score.score.toFixed(2)}
+                  </li>
+                ))}
+              </ul>
             </div>
           )}
 
