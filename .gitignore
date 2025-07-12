@@ -1,3 +1,5 @@
 .env
 backend/target
 frontend/dist
+.vscode
+.idea
