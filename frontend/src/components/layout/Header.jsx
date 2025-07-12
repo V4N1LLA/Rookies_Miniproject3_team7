@@ -24,7 +24,7 @@ const Header = () => {
       </div>
 
       {/* 오른쪽 버튼 영역 */}
-      <div className="space-x-4 flex flex-wrap justify-end items-center">
+      <div className="space-x-6 flex flex-wrap justify-end items-center">
         <button
           onClick={() => navigate("/diary")}
           className="text-[20px] text-gray-700  hover:underline"
@@ -36,6 +36,12 @@ const Header = () => {
           className="text-[20px] text-gray-700 hover:underline"
         >
           채팅
+        </button>
+        <button
+          onClick={() => navigate("/mypage")}
+          className="text-[20px] text-gray-700 hover:underline"
+        >
+          마이페이지
         </button>
         <button
           onClick={handleLogout}
