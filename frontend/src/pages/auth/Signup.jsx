@@ -23,8 +23,8 @@ export default function Signup() {
   };
 
   return (
-    <div className="min-h-screen flex justify-center items-center">
-      <div className="bg-[#F5F5F5] w-[360px] rounded-2xl shadow-xl p-8 border border-gray-300 font-['SejongGeulggot']">
+    <div className="min-h-screen flex justify-center items-center px-4">
+      <div className="bg-[#F5F5F5] w-full max-w-sm rounded-2xl shadow-xl p-8 border border-gray-300 font-['SejongGeulggot']">
         {/* 감정/날씨 아이콘 */}
         <div className="flex justify-around items-center mb-6 border-b border-gray-300 pb-4">
           <img src="/icons/sun.svg" alt="sun" className="w-6 h-6" />
