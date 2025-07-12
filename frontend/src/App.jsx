@@ -9,6 +9,8 @@ import DiaryWrite from "./pages/diary/DiaryWrite";
 import DiaryDetail from "./pages/diary/DiaryDetail";
 import MainPage from "./pages/Main";
 import Header from "./components/layout/Header";
+import ChatRoomList from "./pages/chat/ChatRoomList";
+import ChatRoom from "./pages/chat/ChatRoom";
 
 function App() {
   return (
@@ -26,6 +28,10 @@ function App() {
           <Route path="/diary" element={<Calendar />} />
           <Route path="/diary/DiaryWrite" element={<DiaryWrite />} />
           <Route path="/diary/DiaryDetail/:id" element={<DiaryDetail />} />
+
+          {/* 채팅 라우트 */}
+          <Route path="/chat" element={<ChatRoomList />} />
+          <Route path="/chat/:roomId" element={<ChatRoom />} />
         </Routes>
       </Router>
     </div>

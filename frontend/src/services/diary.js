@@ -87,6 +87,21 @@ export const requestAnalysisById = async (id) => {
         },
       }
     );
+    return response;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+
+export const fetchEmotionScores = async (diaryId) => {
+  const token = localStorage.getItem("token");
+  try {
+    const response = await axios.get(`${API_ANALYSIS_BASE_URL}/${diaryId}/scores`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     return response.data;
   } catch (error) {
     throw error.response?.data || error;

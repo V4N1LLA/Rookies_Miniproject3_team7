@@ -11,42 +11,58 @@ import java.util.List;
 import java.util.Optional;
 import java.time.LocalDate;
 
-@Service
-@RequiredArgsConstructor
+@Service @RequiredArgsConstructor
 public class DiaryServiceImpl implements DiaryService {
 
-    private final DiaryRepository diaryRepository;
+    private final DiaryRepository diaryRepo;
 
-    // ✅ 감정 분석 없이 일기만 등록
     @Override
-    public Diary createDiary(DiaryRequestDto dto, Long userId) {
-        LocalDateTime timestamp = dto.getTimestamp();
-        checkIfDiaryAlreadyExists(userId, timestamp);
+    public Diary createDiary(DiaryRequestDto dto, User user) {
+
+        LocalDateTime ts = dto.getTimestamp() != null
+                ? dto.getTimestamp() : LocalDateTime.now();
+
+        /* 하루 1편 제약 */
+        LocalDateTime s = ts.toLocalDate().atStartOfDay();
+        LocalDateTime e = s.plusDays(1).minusNanos(1);
+        diaryRepo.findByUserAndTimestampBetween(user, s, e)
+                 .ifPresent(d -> { throw new DuplicateDiaryException("이미 작성된 일기가 있습니다."); });
 
         Diary diary = Diary.builder()
-                .userId(userId)
+                .user(user)
                 .title(dto.getTitle())
                 .content(dto.getContent())
-                .timestamp(timestamp)
+                .timestamp(ts)
                 .build();
 
-        return diaryRepository.save(diary);
+        return diaryRepo.save(diary);
     }
 
     @Override
-    public void saveDiary(Diary diary) {
-        diaryRepository.save(diary);
+    public List<Diary> getMyDiaries(User user) {
+        return diaryRepo.findByUserOrderByTimestampDesc(user);
     }
 
     @Override
-    public List<Diary> getAllDiaries() {
-        return diaryRepository.findAllWithAnalysis();
+    public Diary getDiary(Long id, User user) {
+        Diary d = diaryRepo.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Diary not found"));
+        if (!d.getUser().getId().equals(user.getId())) {
+            throw new ForbiddenDiaryException();
+        }
+        return d;
     }
 
     @Override
+    public void deleteDiary(Long id, User user) {
+        Diary d = getDiary(id, user);
+        diaryRepo.delete(d);
+    }
+
+    @Override @Deprecated
     public Diary getDiaryById(Long id) {
-        return diaryRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("해당 ID의 다이어리를 찾을 수 없습니다: " + id));
+        return diaryRepo.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Diary not found"));
     }
 
     @Override
