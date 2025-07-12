@@ -1,3 +1,4 @@
+import { useState } from "react";
 import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -6,30 +7,45 @@ import {
   deleteDiary,
   requestAnalysisById,
   fetchAnaylsisById,
+  fetchEmotionScores,
 } from "../../services/diary";
 import { getKoreanEmotion } from "../../components/common/emotionDictionary";
+import { diaryStore } from "../../store/diaryStore";
+import manifest from "../../../dist/manifest.json";
 
 function DiaryDetail() {
   const { id } = useParams();
+  const store = diaryStore();
   const navigate = useNavigate();
-  const [diary, setDiary] = React.useState(null);
-  const [analysisData, setAnalysisData] = React.useState(null);
-  const [loading, setLoading] = React.useState(true);
-  const token = localStorage.getItem("token");
-  const [analysis, setAnalysis] = React.useState(null);
+  const [loading, setLoading] = useState(true);
+  const [diary, setDiary] = useState(null);
   const [analyzing, setAnalyzing] = React.useState(false);
+  const [emotionScores, setEmotionScores] = useState([]);
+  const token = localStorage.getItem("token");
 
   React.useEffect(() => {
+    // Completely reset all analysis state for fresh diary entry
+    store.clearAllAnalysis();
+    setDiary(null);
+    setLoading(true);
+
     const fetchDiary = async () => {
       try {
         const diaryData = await fetchDiaryById(id);
         setDiary(diaryData);
-        if (diaryData.analysisResult) {
-          setAnalysis(true);
-          const analysisData = await fetchAnaylsisById(id);
-          setAnalysisData(analysisData);
+
+        // Only fetch analysis result if explicitly marked as analyzed
+        if (
+          diaryData.analysisResult !== null &&
+          diaryData.analysisResult !== undefined &&
+          diaryData.analysisResult !== "" // avoid false positives
+        ) {
+          const result = await fetchAnaylsisById(id);
+          store.setAnalysisDataFor(id, result);
+          const scores = await fetchEmotionScores(id);
+          setEmotionScores(scores);
+          store.setAnalysisFor(id, true);
         }
-        console.log("일기 데이터:", diaryData);
       } catch (err) {
         console.error("다이어리 불러오기 실패:", err);
         setDiary(null);
@@ -39,7 +55,13 @@ function DiaryDetail() {
     };
 
     if (token) fetchDiary();
-  }, [id, token]);
+  }, [
+    id,
+    token,
+    store.setAnalysisDataFor,
+    store.setAnalysisFor,
+    store.clearAllAnalysis,
+  ]);
 
   const handleBack = () => {
     navigate("/diary");
@@ -65,14 +87,30 @@ function DiaryDetail() {
 
     try {
       console.log(name, "의 토큰 :", token);
-      const response = requestAnalysisById(id);
-      // 분석 완료되었으므로 바로 fetch
-      const analysisData = await fetchAnaylsisById(id);
-      setAnalysis(true);
-      setAnalysisData(analysisData);
+
+      const response = await requestAnalysisById(id);
+      console.log("분석 요청 성공:", response.status);
+
+      // 분석이 완료되었을 것이므로 새로고침 → useEffect에서 GET 요청 처리됨
+      // 분석 요청 후 바로 결과와 점수 fetch
+      const result = await fetchAnaylsisById(id);
+      store.setAnalysisDataFor(id, result);
+      const scores = await fetchEmotionScores(id);
+      setEmotionScores(scores);
+      store.setAnalysisFor(id, true);
     } catch (error) {
       console.error("감정 분석 실패:", error);
-      alert("감정 분석에 실패했습니다.");
+
+      if (
+        error.response &&
+        error.response.status === 400 &&
+        error.response.data.message === "이미 분석된 일기입니다."
+      ) {
+        // 새로고침으로 분석 결과 자동 반영
+        window.location.reload();
+      } else {
+        alert("감정 분석에 실패했습니다.");
+      }
     } finally {
       setAnalyzing(false);
     }
@@ -80,12 +118,12 @@ function DiaryDetail() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex justify-center items-center py-12 px-4">
-        <div className="w-full max-w-5xl relative">
-          <div className="h-[30px] bg-[#F5C451] rounded-t-2xl shadow-[0_4px_4px_rgba(0,0,0,0.25)] absolute top-0 left-0 right-0 z-30" />
-          <div className="bg-paper pt-[60px] max-w-5xl bg-white/70 shadow-md rounded-b-xl p-10 relative flex flex-col items-center justify-center">
+      <div className="w-full max-w-6xl py-12 px-4 sm:px-6 lg:px-8 ">
+        <div className="w-full relative">
+          <div className="w-full relative h-[30px] bg-[#F5C451] rounded-t-2xl shadow-[0_4px_4px_rgba(0,0,0,0.25)] top-0 left-0 right-0 z-30" />
+          <div className="bg-paper py-[60px] bg-white/70 shadow-md rounded-b-xl relative flex flex-col items-center justify-center">
             <div className="text-gray-500 text-center font-['SejongGeulggot'] text-[25px]">
-              일기찾는중 ...{" "}
+              일기 찾는중 ...{" "}
             </div>
           </div>
         </div>
@@ -95,10 +133,10 @@ function DiaryDetail() {
 
   if (!diary) {
     return (
-      <div className="min-h-screen flex justify-center items-center py-12 px-4">
-        <div className="w-full max-w-5xl relative">
-          <div className="h-[30px] bg-[#F5C451] rounded-t-2xl shadow-[0_4px_4px_rgba(0,0,0,0.25)] absolute top-0 left-0 right-0 z-30" />
-          <div className="bg-paper pt-[60px] max-w-5xl bg-white/70 shadow-md rounded-b-xl p-10 relative">
+      <div className="w-full max-w-6xl py-12 px-4 sm:px-6 lg:px-8">
+        <div className="w-full relative text-center">
+          <div className="w-full relative h-[30px] bg-[#F5C451] rounded-t-2xl shadow-[0_4px_4px_rgba(0,0,0,0.25)] top-0 left-0 right-0 z-30" />
+          <div className="bg-paper py-[60px] bg-white/70 shadow-md rounded-b-xl relative">
             <h2 className="font-['SejongGeulggot'] text-[25px] font-bold mb-4">
               다이어리 없음
             </h2>
@@ -126,13 +164,18 @@ function DiaryDetail() {
     );
   }
 
+  const analysis = store.analysisMap[id];
+  const analysisData = store.analysisDataMap[id];
+
+  // 분석 결과 로딩 상태
+  const isAnalysisLoading = analysis && (!analysisData || emotionScores.length === 0);
+
   return (
-    <div className="min-h-screen flex justify-center items-center py-12 px-4">
-      <div className="w-full max-w-5xl relative">
+    <div className="w-full max-w-6xl px-4 sm:px-6 lg:px-8 pb-12 bg-transparent">
+      <div className="w-full relative">
         <div className="h-[30px] bg-[#F5C451] rounded-t-2xl shadow-[0_4px_4px_rgba(0,0,0,0.25)] absolute top-0 left-0 right-0 z-30" />
-        <div className="bg-paper pt-[60px] max-w-5xl bg-white/70 shadow-md rounded-b-xl p-10 relative">
+        <div className="bg-paper pt-[60px] bg-white/70 shadow-md rounded-b-xl p-10 relative">
           <div className="flex items-center justify-between mb-4">
-            {/* <h2 className="font-['SejongGeulggot'] text-[25px] font-bold">다이어리</h2> */}
             <div className="flex items-center space-x-2">
               <span className="text-2xl">{diary.mood}</span>
               <span className="text-xl">{diary.weather}</span>
@@ -159,7 +202,16 @@ function DiaryDetail() {
             </div>
           </div>
 
-          {analysisData &&
+          {isAnalysisLoading && (
+            <div className="mb-6 flex flex-col items-center justify-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#F5C451] mb-2" />
+              <div className="text-gray-500 font-['SejongGeulggot'] text-lg">
+                분석 결과 불러오는 중...
+              </div>
+            </div>
+          )}
+
+          {!isAnalysisLoading && analysisData &&
             (() => {
               const emotion = getKoreanEmotion(analysisData.domainEmotion);
               return (
@@ -173,9 +225,28 @@ function DiaryDetail() {
                 </div>
               );
             })()}
-          {analysisData && (
-            <div className="mb-6 p-4 rounded-lg bg-black/30 text-gray-800 font-noto text-lg shadow">
-              {analysisData.message}
+          {!isAnalysisLoading && analysisData && (
+            <div className="mb-6 p-4 rounded-lg bg-black/30 text-gray-800 font-noto text-lg shadow whitespace-pre-line">
+              {analysisData.message.split("\n").map((line, idx) => (
+                <React.Fragment key={idx}>
+                  {line}
+                  <br />
+                </React.Fragment>
+              ))}
+            </div>
+          )}
+          {!isAnalysisLoading && emotionScores.length > 0 && (
+            <div className="mb-6 p-4 rounded-lg bg-black/10 text-gray-800 font-noto text-lg shadow">
+              <h3 className="text-xl mb-2 font-bold">감정 분석 점수</h3>
+              <ul className="list-disc list-inside">
+                {emotionScores.map((score, idx) => (
+                  <p key={idx}>
+                    {getKoreanEmotion(score.code).label}{" "}
+                    {getKoreanEmotion(score.code).emoji}:{" "}
+                    {score.score.toFixed(2)}
+                  </p>
+                ))}
+              </ul>
             </div>
           )}
 

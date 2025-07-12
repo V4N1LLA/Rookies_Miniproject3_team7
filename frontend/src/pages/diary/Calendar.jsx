@@ -1,6 +1,6 @@
 import React from "react";
 import { useCalendarStore } from "../../store/calendarStore";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import "../../index.css";
 import EmotionBubble from "../../components/common/emotionBubble";
 import { useEffect, useState } from "react";
@@ -8,6 +8,7 @@ import { fetchDiaries } from "../../services/diary";
 import { ChevronRightIcon } from "@heroicons/react/24/solid";
 import { ChevronLeftIcon } from "@heroicons/react/24/solid";
 import { LoadingToast } from "../../components/common/Alert";
+import { diaryStore } from "../../store/diaryStore";
 
 function getDaysInMonth(year, month) {
   return new Date(year, month, 0).getDate();
@@ -23,6 +24,10 @@ function isFutureDate(year, month, day) {
 function Calendar() {
   const { year, month, setYear, setMonth } = useCalendarStore();
   const navigate = useNavigate();
+  const location = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   const [diaryDates, setDiaryDates] = useState([]);
   const [loading, setLoading] = useState(false);
   useEffect(() => {
@@ -44,7 +49,7 @@ function Calendar() {
       .finally(() => {
         setLoading(false);
       });
-  }, []);
+  }, [location.pathname]);
 
   const changeMonth = (increment) => {
     const newMonth = month + increment;
@@ -82,10 +87,10 @@ function Calendar() {
   return (
     <>
       {loading && <LoadingToast message="다이어리 불러오는 중..." />}
-      <div className="flex justify-center items-center bg-transparent rounded-xl">
-        <div className="w-full max-w-5xl relative bg-transparent rounded-xl">
+      <div className="w-full max-w-6xl px-4 sm:px-6 lg:px-8 bg-transparent rounded-xl">
+        <div className="w-full relative bg-transparent rounded-xl mx-auto">
           <div className="h-[30px] bg-[#F5C451] rounded-t-2xl shadow-[0_4px_4px_rgba(0,0,0,0.25)] absolute top-0 left-0 right-0 z-30 " />
-          <div className="bg-paper pt-[60px] max-w-5xl shadow-md rounded-xl p-10 relative">
+          <div className="bg-paper pt-[60px] w-full shadow-md rounded-xl p-10 relative">
             <div className="absolute left-4 top-1/2 z-20">
               <button
                 onClick={() => changeMonth(-1)}
@@ -107,7 +112,6 @@ function Calendar() {
               <span>{String(month).padStart(2, "0")}월</span>
             </div>
             <div className="grid grid-cols-7 justify-items-center gap-y-[20px] text-center text-[25px] font-light font-['Noto_Sans_KR','sans-serif']">
-              {" "}
               {["일", "월", "화", "수", "목", "금", "토"].map((d) => (
                 <div
                   key={d}
@@ -139,7 +143,6 @@ function Calendar() {
                     onClick={() => handleDayClick(day)}
                   >
                     <div className="relative w-full h-full flex items-center justify-center">
-                      {" "}
                       <span className="absolute z-40">{day || ""}</span>
                       {hasDiary && (
                         <div className="absolute w-full h-full flex items-center justify-center">

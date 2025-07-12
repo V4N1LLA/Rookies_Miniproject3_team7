@@ -67,8 +67,8 @@ function DiaryWrite() {
   };
 
   return (
-    <div className="min-h-screen flex justify-center items-center py-12 px-4">
-      <div className="w-full bg-paper  max-w-5xl bg-white/70 shadow-md rounded-xl p-10">
+    <div className="w-full px-4 max-w-6xl sm:px-6 lg:px-8 ">
+      <div className="w-full mx-auto bg-paper shadow-md rounded-xl py-6 px-10">
         {/* 날짜 및 날씨 선택 영역 */}
         <div className="flex items-center justify-center gap-20 mb-6">
           <div className="text-[25px] px-2 py-1 tracking-widest font-['SejongGeulggot'] border-b border-gray-400">
@@ -101,7 +101,7 @@ function DiaryWrite() {
 
         {/* 일기 입력 */}
         <textarea
-          rows="10"
+          rows="9"
           value={content}
           onChange={(e) => setContent(e.target.value)}
           className="w-full border focus:outline-none focus:ring-2 focus:ring-gray-600 border-gray-300 text-[#222222] rounded-lg p-6 font-['SejongGeulggot'] text-[20px] leading-relaxed bg-white/50 bg-[repeating-linear-gradient(to_bottom,transparent,transparent_35px,#ccc_35px,#ccc_36px)]"
