@@ -15,8 +15,12 @@ services:
       SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
       EMOTION_API_URL: http://emotion-api:8000
+      FAISS_API_URL: http://fastapi-chatbot:8000/api/vectors
     depends_on:
       - emotion-api
+      - fastapi-chatbot
+    networks:
+      - app-network
 
   emotion-api:
     build:
@@ -31,6 +35,8 @@ services:
       interval: 5s
       timeout: 3s
       retries: 5
+    networks:
+      - app-network
 
 # frontend:
 #   build:
@@ -45,6 +51,7 @@ services:
 
   fastapi-chatbot:
     build: ./chatbot
+    container_name: fastapi-chatbot
     ports:
       - "8001:8000"
     env_file:
