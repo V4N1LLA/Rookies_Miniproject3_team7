@@ -14,7 +14,7 @@ public class WebConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:3000")  // 프론트엔드 주소
+                        .allowedOrigins("http://localhost:3000", "http://moodiary_frontend", "http://frontend")  // 프론트엔드 주소
                         .allowedMethods("*")  // GET, POST, PUT, DELETE, OPTIONS 등 허용
                         .allowedHeaders("*")  // 모든 헤더 허용
                         .allowCredentials(true);  // 쿠키/토큰 등 포함 허용

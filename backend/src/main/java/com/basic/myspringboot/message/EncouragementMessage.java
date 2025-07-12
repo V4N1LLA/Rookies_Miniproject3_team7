@@ -1,5 +1,6 @@
 package com.basic.myspringboot.message;
 
+import com.basic.myspringboot.analysis.entity.EmotionAnalysisResult;
 import com.basic.myspringboot.diary.Diary;
 import jakarta.persistence.*;
 import lombok.*;
@@ -21,6 +22,10 @@ public class EncouragementMessage {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "diary_id", nullable = false)
     private Diary diary;
+
+    @OneToOne
+    @JoinColumn(name = "analysis_id")
+    private EmotionAnalysisResult analysisResult;
 
     @Column(name = "emotion", nullable = false)
     private String emotion;

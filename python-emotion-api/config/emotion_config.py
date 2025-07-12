@@ -9,10 +9,10 @@ label_map = {
 
 # 감정 보정 계수
 adjustment = {
-    "HAPPY": 2.0,
-    "SAD": 1.2,
+    "HAPPY": 1.5,
+    "SAD": 0.7,
     "ANGRY": 1.0,
-    "FEAR": 1.0,
+    "FEAR": 1.2,
     "TENDER": 0.2,
 }
 

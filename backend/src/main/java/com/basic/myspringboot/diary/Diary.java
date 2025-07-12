@@ -31,8 +31,7 @@ public class Diary {
     @Column(nullable = false)
     private LocalDateTime timestamp;
 
-    /* 감정 분석 결과 */
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "analysis_id")
     private EmotionAnalysisResult analysisResult;
 
