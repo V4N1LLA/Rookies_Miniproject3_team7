@@ -11,6 +11,7 @@ import MainPage from "./pages/Main";
 import Header from "./components/layout/Header";
 import ChatRoomList from "./pages/chat/ChatRoomList";
 import ChatRoom from "./pages/chat/ChatRoom";
+import Mypage from "./pages/auth/Mypage";
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
                 <Header />
                 <div className="flex flex-col justify-center items-center w-full">
                   <Routes>
+                    <Route path="/mypage" element={<Mypage />} />
                     <Route path="/diary" element={<Calendar />} />
                     <Route path="/diary/DiaryWrite" element={<DiaryWrite />} />
                     <Route
