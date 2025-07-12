@@ -38,7 +38,7 @@ function App() {
                       element={<DiaryDetail />}
                     />
                     <Route path="/chat" element={<ChatRoomList />} />
-                    <Route path="/chat/:roomId" element={<ChatRoom />} />
+                    <Route path="/chat/:sessionId" element={<ChatRoom />} />
                   </Routes>
                 </div>
               </>

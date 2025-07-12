@@ -16,7 +16,8 @@ export default function Login() {
       const resBody = await login(email, password);
       const { token, user } = resBody.data;
       localStorage.setItem("token", token);
-      localStorage.setItem("user", JSON.stringify(user));
+      localStorage.setItem("user", user.name);
+      localStorage.setItem("email", user.email);
       console.log("토큰:", token);
       setShowToast(true);
 
@@ -38,12 +39,22 @@ export default function Login() {
           <img src="/icons/sun.svg" alt="sun" className="w-6 h-6" />
           <img src="/icons/cloud rain.svg" alt="cloud" className="w-6 h-6" />
           <img src="/icons/sun.svg" alt="rain" className="w-6 h-6" />
-          <img src="/icons/cloud rain.svg" alt="heavy rain" className="w-6 h-6" />
-          <img src="/icons/cloud rain.svg" alt="heavy rain" className="w-6 h-6" />
+          <img
+            src="/icons/cloud rain.svg"
+            alt="heavy rain"
+            className="w-6 h-6"
+          />
+          <img
+            src="/icons/cloud rain.svg"
+            alt="heavy rain"
+            className="w-6 h-6"
+          />
         </div>
 
         {/* 로그인 타이틀 */}
-        <h2 className="text-center text-xl font-bold mb-3 text-gray-800">로그인</h2>
+        <h2 className="text-center text-xl font-bold mb-3 text-gray-800">
+          로그인
+        </h2>
 
         {/* 로그인 입력 폼 */}
         <form onSubmit={handleLogin} className="space-y-5">
