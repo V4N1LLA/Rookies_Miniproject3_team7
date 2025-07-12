@@ -7,21 +7,21 @@ from faiss_index import insert_vector
 import os
 import json
 
-# Load .env
+# 환경 변수 로딩
 load_dotenv()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
-# FastAPI app with Swagger metadata
+# FastAPI 앱 생성
 app = FastAPI(
     title="FastAPI Chat & Vector API",
     description="GPT 기반 대화 및 감정 분석 벡터 저장 API",
     version="1.0.0"
 )
 
-# LangChain LLM
+# LangChain LLM 설정
 llm = ChatOpenAI(model="gpt-3.5-turbo")
 
-# Request schema
+# 채팅 요청 스키마
 class ChatRequest(BaseModel):
     sessionId: int
     sender: str
@@ -46,11 +46,13 @@ async def save_vector(request: Request):
     data = await request.json()
     print("Received vector data:", data)
 
+    # 벡터 추출
     vector_json = data['vector']
     if isinstance(vector_json, str):
         vector = json.loads(vector_json)
     else:
         vector = vector_json
+
     analysis_id = data['analysis_id']
     insert_vector(analysis_id, vector)
 

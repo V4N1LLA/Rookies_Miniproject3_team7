@@ -1,7 +1,5 @@
 package com.basic.myspringboot.chat.service;
 
-import java.util.List;
-
 import com.basic.myspringboot.chat.client.ChatbotClient;
 import com.basic.myspringboot.chat.client.LangServeClient;
 import com.basic.myspringboot.chat.client.VectorDbClient;
@@ -13,24 +11,21 @@ import com.basic.myspringboot.chat.entity.Feedback;
 import com.basic.myspringboot.chat.repository.ChatMessageRepository;
 import com.basic.myspringboot.chat.repository.ChatSessionRepository;
 import com.basic.myspringboot.chat.repository.FeedbackRepository;
+import com.basic.myspringboot.auth.security.UserPrincipal;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.persistence.EntityNotFoundException;
-
 import lombok.RequiredArgsConstructor;
-
-import java.util.function.LongFunction;
-import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.JsonNode;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -49,37 +44,33 @@ public class ChatService {
     @Value("${openai.api.key}")
     private String openAiApiKey;
 
-    public ChatSession createSession() {
-        ChatSession session = ChatSession.builder().build();
+    public ChatSession createSession(UserPrincipal userPrincipal) {
+        Long userId = userPrincipal.getId();
+        ChatSession session = ChatSession.builder()
+                .userId(userId)
+                .build();
         return chatSessionRepository.save(session);
     }
 
-    public ChatSession getSessionById(Long id) {
-        return chatSessionRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Session not found with id: " + id));
-    }
-
-    public ChatMessage saveMessage(Long sessionId, String sender, String content, String jwtToken) {
+    public ChatMessage saveMessage(Long sessionId, String sender, String content, UserPrincipal userPrincipal) {
         ChatSession session = chatSessionRepository.findById(sessionId)
                 .orElseThrow(() -> new IllegalArgumentException("Session not found"));
 
-        // 1. 사용자 메시지 저장
         ChatMessage userMessage = ChatMessage.builder()
                 .chatSession(session)
-                .sender(sender)
+                .sender("USER")
                 .content(content)
                 .build();
 
         ChatMessage savedUser = chatMessageRepository.save(userMessage);
         session.addMessage(savedUser);
 
-        // 2. GPT 응답 생성 및 저장
         try {
-            String botReply = generateBotResponse(content);  // GPT 응답 생성
+            String botReply = generateBotResponse(content);
 
             ChatMessage botMessage = ChatMessage.builder()
                     .chatSession(session)
-                    .sender("BOT")  // 👈 반드시 "BOT" 으로 저장
+                    .sender("BOT")
                     .content(botReply)
                     .build();
 
@@ -90,7 +81,6 @@ public class ChatService {
             throw new RuntimeException("GPT 응답 생성 실패", e);
         }
 
-        // 3. Embedding 저장
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
@@ -101,13 +91,15 @@ public class ChatService {
             body.put("model", "text-embedding-ada-002");
 
             HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
-            ResponseEntity<String> response = restTemplate.postForEntity("https://api.openai.com/v1/embeddings", entity, String.class);
+            ResponseEntity<String> response = restTemplate.postForEntity(
+                    "https://api.openai.com/v1/embeddings", entity, String.class);
 
             JsonNode jsonNode = objectMapper.readTree(response.getBody());
             JsonNode embeddingNode = jsonNode.get("data").get(0).get("embedding");
             String embeddingJson = objectMapper.writeValueAsString(embeddingNode);
 
-            vectorDbClient.saveEmbedding(savedUser.getId(), embeddingJson, 1536, "neutral", jwtToken);
+            vectorDbClient.saveEmbedding(savedUser.getId(), embeddingJson, 1536, "neutral");
+
         } catch (Exception e) {
             throw new RuntimeException("Embedding 생성 실패", e);
         }
@@ -137,9 +129,10 @@ public class ChatService {
                 .findByChatSessionId(session.getId())
                 .stream()
                 .map(message -> ChatHistoryResponse.ChatHistoryItem.builder()
-                        .userMessage(message.getSender().equals("user") ? message.getContent() : "")
-                        .aiResponse(message.getSender().equals("ai") ? message.getContent() : "")
+                        .userMessage("USER".equalsIgnoreCase(message.getSender()) ? message.getContent() : "")
+                        .aiResponse("BOT".equalsIgnoreCase(message.getSender()) ? message.getContent() : "")
                         .timestamp(message.getCreatedAt().toString())
+                        .feedback(message.getFeedback() != null ? message.getFeedback().getFeedback() : null)
                         .build())
                 .collect(Collectors.toList());
 
@@ -166,5 +159,4 @@ public class ChatService {
         return feedbackRepository.findByChatMessage_Id(chatMessageId)
                 .orElseThrow(() -> new RuntimeException("Feedback not found"));
     }
-
 }
