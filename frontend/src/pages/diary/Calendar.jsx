@@ -84,7 +84,7 @@ function Calendar() {
   return (
     <>
       {loading && <LoadingToast message="다이어리 불러오는 중..." />}
-      <div className="flex justify-center items-center bg-transparent rounded-xl">
+      <div className="min-h-screen flex justify-center items-center bg-transparent rounded-xl">
         <div className="w-full max-w-5xl relative bg-transparent rounded-xl">
           <div className="h-[30px] bg-[#F5C451] rounded-t-2xl shadow-[0_4px_4px_rgba(0,0,0,0.25)] absolute top-0 left-0 right-0 z-30 " />
           <div className="bg-paper pt-[60px] max-w-5xl shadow-md rounded-xl p-10 relative">

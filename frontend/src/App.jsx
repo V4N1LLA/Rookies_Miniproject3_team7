@@ -14,7 +14,7 @@ import ChatRoom from "./pages/chat/ChatRoom";
 
 function App() {
   return (
-    <div className="min-h-screen p-[30px]">
+    <div className="min-h-screen">
       <Router>
         <Header></Header>
         <Routes>
