@@ -11,10 +11,10 @@ const Header = () => {
     navigate("/");
   };
 
-  if (!token) return null;
+  //if (!token) return null;
 
   return (
-    <header className="w-full px-6 pt-6 flex justify-between items-center font-['SejongGeulggot'] z-50 max-w-screen-xl mx-auto">
+    <header className="w-full py-[30px] px-[70px] bg-transparent flex justify-between items-center font-['SejongGeulggot'] z-50">
       {/* 왼쪽 로고 영역 */}
       <div
         className="text-[25px] text-[#6DD0F0] font-extrabold font-erica stroke-[0.5px] cursor-pointer"

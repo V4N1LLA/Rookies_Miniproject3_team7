@@ -23,8 +23,8 @@ export default function Signup() {
   };
 
   return (
-    <div className="min-h-screen flex justify-center items-center px-4">
-      <div className="bg-[#F5F5F5] w-full max-w-sm rounded-2xl shadow-xl p-8 border border-gray-300 font-['SejongGeulggot']">
+    <div className="min-h-screen flex items-center justify-center px-4">
+      <div className="bg-[#F5F5F5] w-full max-w-md rounded-2xl shadow-lg p-8 border border-gray-200 font-['SejongGeulggot']">
         {/* 감정/날씨 아이콘 */}
         <div className="flex justify-around items-center mb-6 border-b border-gray-300 pb-4">
           <img src="/icons/sun.svg" alt="sun" className="w-6 h-6" />
@@ -34,14 +34,14 @@ export default function Signup() {
           <img src="/icons/cloud rain.svg" alt="rain" className="w-6 h-6" />
         </div>
 
-        <h2 className="text-center text-xl font-bold mb-4">회원가입</h2>
+        <h2 className="text-center text-xl font-bold mb-3">회원가입</h2>
 
         <form onSubmit={handleSignup} className="space-y-4">
           <div>
             <label className="block mb-1 text-sm text-gray-700">이름</label>
             <input
               type="text"
-              placeholder="이름"
+              placeholder="이름을 입력하세요."
               className="w-full px-4 py-2 border rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 shadow-sm"
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -53,7 +53,7 @@ export default function Signup() {
             <label className="block mb-1 text-sm text-gray-700">이메일</label>
             <input
               type="email"
-              placeholder="이메일"
+              placeholder="이메일을 입력하세요."
               className="w-full px-4 py-2 border rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 shadow-sm"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -65,7 +65,7 @@ export default function Signup() {
             <label className="block mb-1 text-sm text-gray-700">비밀번호</label>
             <input
               type="password"
-              placeholder="비밀번호"
+              placeholder="비밀번호를 입력하세요."
               className="w-full px-4 py-2 border rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 shadow-sm"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -81,7 +81,7 @@ export default function Signup() {
           </button>
         </form>
         {/* 로그인 돌아가기 링크 */}
-        <p className="mt-6 text-sm text-center text-gray-600">
+        <p className="mt-6 text-l text-center text-gray-600">
           계정이 있으신가요?{" "}
           <span
             className="text-blue-600 font-semibold underline cursor-pointer"
