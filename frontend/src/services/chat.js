@@ -22,11 +22,16 @@ export const fetchChatRooms = async () => {
 // 메시지 목록
 export const fetchChatMessages = async (sessionId) => {
   try {
-    const response = await axios.get(`${API_CHAT_BASE_URL}/chat/messages?sessionId=${sessionId}`, {
-      headers: getAuthHeader(),
-    });
+    const response = await axios.get(
+      `${API_CHAT_BASE_URL}/chat/messages?sessionId=${sessionId}`,
+      {
+        headers: getAuthHeader(),
+      }
+    );
+    console.log("📨 fetchChatMessages response:", response);
     return response.data.data;
   } catch (error) {
+    console.error("❌ fetchChatMessages error:", error);
     throw error.response?.data || error;
   }
 };
@@ -43,6 +48,30 @@ export const sendMessage = async (roomId, message) => {
       { headers: getAuthHeader() }
     );
     return response.data.data; // 👈 배열로 받음
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+// 채팅 세션 시작
+export const startChatSession = async () => {
+  try {
+    const response = await axios.post(`${API_CHAT_BASE_URL}/chat/start`, null, {
+      headers: getAuthHeader(),
+    });
+    return response.data.data; // sessionId 반환
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+// 채팅 히스토리 조회
+export const fetchChatHistory = async () => {
+  try {
+    const response = await axios.get(`${API_CHAT_BASE_URL}/chat/history`, {
+      headers: getAuthHeader(),
+    });
+    return response.data.data; // history 객체 반환
   } catch (error) {
     throw error.response?.data || error;
   }

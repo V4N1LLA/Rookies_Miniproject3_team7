@@ -15,6 +15,7 @@ export default function ChatRoom() {
       try {
         const data = await fetchChatMessages(roomId);
         setMessages(data);
+        console.log("불러온 메시지 목록:", data);
       } catch (err) {
         console.error("채팅 메시지 불러오기 실패", err);
         alert("채팅 메시지를 불러오는 데 실패했습니다.");
@@ -29,7 +30,8 @@ export default function ChatRoom() {
 
     try {
       const newMessages = await sendMessage(roomId, input); // ✅ 배열로 받아옴
-      setMessages((prev) => [...prev, ...newMessages]);     // ✅ USER, BOT 둘 다 append
+      console.log("전송 후 새 메시지 목록:", newMessages);
+      setMessages((prev) => [...prev, ...newMessages]); // ✅ USER, BOT 둘 다 append
       setInput("");
     } catch (err) {
       console.error("메시지 전송 실패", err);
@@ -59,7 +61,9 @@ export default function ChatRoom() {
           {messages.map((msg, index) => (
             <div
               key={msg.messageId || msg.id || index}
-              className={`mb-2 ${msg.sender === "USER" ? "text-right" : "text-left"}`}
+              className={`mb-2 ${
+                msg.sender === "USER" ? "text-right" : "text-left"
+              }`}
             >
               <span
                 className={`inline-block px-4 py-2 rounded-lg ${
