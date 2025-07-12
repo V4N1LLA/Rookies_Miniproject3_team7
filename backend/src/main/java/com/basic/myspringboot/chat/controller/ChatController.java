@@ -67,6 +67,26 @@ public class ChatController {
         return ResponseEntity.ok(ApiResponse.ok(sessions, "채팅 세션 목록 조회 성공"));
     }
 
+    @Operation(summary = "채팅 메시지 목록 조회", description = "해당 세션 ID에 속한 메시지들을 조회합니다.")
+    @GetMapping("/chat/messages")
+    public ResponseEntity<ApiResponse<List<ChatMessageResponse>>> getMessages(
+            @RequestParam Long sessionId,
+            @AuthenticationPrincipal UserPrincipal userPrincipal
+    ) {
+        List<ChatMessage> messages = chatService.getMessagesBySessionId(sessionId);
+
+        List<ChatMessageResponse> responseList = messages.stream()
+                .map(m -> ChatMessageResponse.builder()
+                        .messageId(m.getId())
+                        .sender(m.getSender())
+                        .content(m.getMessage())
+                        .timestamp(m.getTimestamp())
+                        .build())
+                .toList();
+
+        return ResponseEntity.ok(ApiResponse.ok(responseList, "채팅 메시지 조회 성공"));
+    }
+
     @Operation(summary = "채팅 히스토리 조회", description = "현재 로그인된 사용자의 AI 채팅 히스토리를 조회합니다.")
     @GetMapping("/chat/history")
     public ResponseEntity<ApiResponse<ChatHistoryResponse>> getHistory(@AuthenticationPrincipal UserPrincipal userPrincipal) {

@@ -125,20 +125,29 @@ public class ChatService {
         ChatSession session = chatSessionRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Session not found for userId: " + userId));
 
-        List<ChatHistoryResponse.ChatHistoryItem> historyItems = chatMessageRepository
-                .findByChatSessionId(session.getId())
-                .stream()
-                .map(message -> ChatHistoryResponse.ChatHistoryItem.builder()
-                        .userMessage("USER".equalsIgnoreCase(message.getSender()) ? message.getContent() : "")
-                        .aiResponse("BOT".equalsIgnoreCase(message.getSender()) ? message.getContent() : "")
-                        .timestamp(message.getCreatedAt().toString())
-                        .feedback(message.getFeedback() != null ? message.getFeedback().getFeedback() : null)
-                        .build())
-                .collect(Collectors.toList());
+        List<ChatMessage> messages = chatMessageRepository.findByChatSessionIdOrderByCreatedAtAsc(session.getId());
+
+        List<ChatHistoryResponse.ChatHistoryItem> history = new ArrayList<>();
+
+        for (int i = 0; i < messages.size() - 1; i++) {
+            ChatMessage userMsg = messages.get(i);
+            ChatMessage botMsg = messages.get(i + 1);
+
+            // USER → BOT 순서일 경우에만 묶기
+            if ("USER".equalsIgnoreCase(userMsg.getSender()) && "BOT".equalsIgnoreCase(botMsg.getSender())) {
+                history.add(ChatHistoryResponse.ChatHistoryItem.builder()
+                        .userMessage(userMsg.getContent())
+                        .aiResponse(botMsg.getContent())
+                        .timestamp(userMsg.getCreatedAt().toString())  // 또는 format 지정
+                        .feedback(userMsg.getFeedback() != null ? userMsg.getFeedback().getFeedback() : null)
+                        .build());
+                i++; // BOT 메시지 건너뛰기
+            }
+        }
 
         return ChatHistoryResponse.builder()
                 .userId(userId)
-                .history(historyItems)
+                .history(history)
                 .build();
     }
 
@@ -162,6 +171,10 @@ public class ChatService {
     public Feedback getFeedbackForVectorSearch(Long chatMessageId) {
         return feedbackRepository.findByChatMessage_Id(chatMessageId)
                 .orElseThrow(() -> new RuntimeException("Feedback not found"));
+    }
+
+    public List<ChatMessage> getMessagesBySessionId(Long sessionId) {
+        return chatMessageRepository.findByChatSessionId(sessionId);
     }
 
     public List<ChatMessage> saveUserAndBotMessage(Long sessionId, String content, UserPrincipal userPrincipal) {
