@@ -31,36 +31,28 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex justify-center items-center">
-      <div className="bg-[#F5F5F5] w-[360px] rounded-2xl shadow-xl p-8 border border-gray-300 font-['SejongGeulggot'] mx-auto">
+    <div className="min-h-screen flex items-center justify-center px-4">
+      <div className="bg-[#F5F5F5] w-full max-w-md rounded-2xl shadow-lg p-8 border border-gray-200 font-['SejongGeulggot']">
         {/* 감정/날씨 아이콘 */}
-        <div className="flex justify-around items-center mb-6 border-b border-gray-300 pb-4">
+        <div className="flex justify-center gap-4 mb-6 border-b border-gray-200 pb-4">
           <img src="/icons/sun.svg" alt="sun" className="w-6 h-6" />
           <img src="/icons/cloud rain.svg" alt="cloud" className="w-6 h-6" />
           <img src="/icons/sun.svg" alt="rain" className="w-6 h-6" />
-          <img
-            src="/icons/cloud rain.svg"
-            alt="heavy rain"
-            className="w-6 h-6"
-          />
-          <img
-            src="/icons/cloud rain.svg"
-            alt="heavy rain"
-            className="w-6 h-6"
-          />
+          <img src="/icons/cloud rain.svg" alt="heavy rain" className="w-6 h-6" />
+          <img src="/icons/cloud rain.svg" alt="heavy rain" className="w-6 h-6" />
         </div>
 
         {/* 로그인 타이틀 */}
-        <h2 className="text-center text-xl font-bold mb-4">로그인</h2>
+        <h2 className="text-center text-xl font-bold mb-3 text-gray-800">로그인</h2>
 
         {/* 로그인 입력 폼 */}
-        <form onSubmit={handleLogin} className="space-y-4">
+        <form onSubmit={handleLogin} className="space-y-5">
           <div>
-            <label className="block mb-1 text-sm text-gray-700">이메일</label>
+            <label className="block mb-2 text-m text-gray-700">이메일</label>
             <input
               type="email"
-              placeholder="이메일"
-              className="w-full px-4 py-2 border rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 shadow-sm"
+              placeholder="이메일을 입력하세요."
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 text-m"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -68,11 +60,11 @@ export default function Login() {
           </div>
 
           <div>
-            <label className="block mb-1 text-sm text-gray-700">비밀번호</label>
+            <label className="block mb-2 text-m text-gray-700">비밀번호</label>
             <input
               type="password"
-              placeholder="비밀번호"
-              className="w-full px-4 py-2 border rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 shadow-sm"
+              placeholder="비밀번호를 입력하세요."
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 text-m"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -81,14 +73,14 @@ export default function Login() {
 
           <button
             type="submit"
-            className="w-full bg-gray-300 text-black py-2 rounded-md font-semibold shadow-inner hover:bg-gray-400 transition"
+            className="text-m w-full bg-blue-500 text-white py-2 rounded-lg font-semibold shadow hover:bg-blue-600 transition mt-6"
           >
             로그인
           </button>
         </form>
 
         {/* 회원가입 링크 */}
-        <p className="mt-6 text-sm text-center text-gray-600">
+        <p className="mt-6 text-m text-center text-gray-600">
           계정이 없으신가요?{" "}
           <span
             className="text-blue-600 font-semibold underline cursor-pointer"

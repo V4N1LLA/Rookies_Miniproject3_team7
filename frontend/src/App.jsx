@@ -14,27 +14,37 @@ import ChatRoom from "./pages/chat/ChatRoom";
 
 function App() {
   return (
-    <div className="min-h-screen p-[30px]">
-      <Router>
-        <Header></Header>
+    <Router>
+      <div className="min-h-screen flex flex-col justify-start">
         <Routes>
-          <Route path="/" element={<MainPage />} />
-
-          {/* 로그인 / 회원가입 라우트 */}
+          {/* 로그인 / 회원가입은 헤더 없이 */}
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
-
-          {/* 다이어리 라우트 */}
-          <Route path="/diary" element={<Calendar />} />
-          <Route path="/diary/DiaryWrite" element={<DiaryWrite />} />
-          <Route path="/diary/DiaryDetail/:id" element={<DiaryDetail />} />
-
-          {/* 채팅 라우트 */}
-          <Route path="/chat" element={<ChatRoomList />} />
-          <Route path="/chat/:roomId" element={<ChatRoom />} />
+          <Route path="/" element={<MainPage />} />
+          {/* 나머지 페이지는 헤더 포함 */}
+          <Route
+            path="*"
+            element={
+              <>
+                <Header />
+                <div className="flex flex-col justify-center items-center w-full">
+                  <Routes>
+                    <Route path="/diary" element={<Calendar />} />
+                    <Route path="/diary/DiaryWrite" element={<DiaryWrite />} />
+                    <Route
+                      path="/diary/DiaryDetail/:id"
+                      element={<DiaryDetail />}
+                    />
+                    <Route path="/chat" element={<ChatRoomList />} />
+                    <Route path="/chat/:roomId" element={<ChatRoom />} />
+                  </Routes>
+                </div>
+              </>
+            }
+          />
         </Routes>
-      </Router>
-    </div>
+      </div>
+    </Router>
   );
 }
 
