@@ -1,13 +1,13 @@
 package com.basic.myspringboot.diary;
 
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
+import com.basic.myspringboot.auth.entity.User;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-public interface DiaryRepository extends CrudRepository<Diary, Long> {
+public interface DiaryRepository extends JpaRepository<Diary, Long> {
 
     List<Diary> findByUserId(Long userId);
 

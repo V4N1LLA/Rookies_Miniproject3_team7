@@ -2,6 +2,7 @@ package com.basic.myspringboot.common;
 
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 
 /**
@@ -18,6 +19,7 @@ public class ApiResponse<T> {
     private boolean success;
     private T data;
     private String message;
+    private String feedback;
     private String timestamp;
 
     // ✅ 성공 응답 생성
@@ -39,4 +41,23 @@ public class ApiResponse<T> {
                 .timestamp(ZonedDateTime.now().toString())
                 .build();
     }
+    public static <T> ApiResponse<T> failure(T data, String message) {
+        return ApiResponse.<T>builder()
+                .success(false)
+                .data(data)
+                .message(message)
+                .timestamp(LocalDateTime.now().toString())
+                .build();
+    }
+
+    public static <T> ApiResponse<T> success(T data, String message, String feedback) {
+        return ApiResponse.<T>builder()
+                .success(true)
+                .data(data)
+                .message(message)
+                .feedback(feedback)
+                .timestamp(LocalDateTime.now().toString())
+                .build();
+    }
+
 }
