@@ -38,12 +38,11 @@ export const sendMessage = async (roomId, message) => {
       `${API_CHAT_BASE_URL}/chat`,
       {
         sessionId: parseInt(roomId),
-        sender: "USER",
         content: message,
       },
       { headers: getAuthHeader() }
     );
-    return response.data.data;
+    return response.data.data; // 👈 배열로 받음
   } catch (error) {
     throw error.response?.data || error;
   }

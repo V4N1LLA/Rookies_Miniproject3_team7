@@ -27,21 +27,12 @@ export default function ChatRoom() {
     e.preventDefault();
     if (!input.trim()) return;
 
-    // Optimistic UI
-    const tempMessage = {
-      id: Date.now(),
-      sender: "USER",
-      content: input,
-    };
-    setMessages((prev) => [...prev, tempMessage]);
-
     try {
-      const newMsg = await sendMessage(roomId, input);
-      setMessages((prev) => [...prev, newMsg]);
+      const newMessages = await sendMessage(roomId, input); // ✅ 배열로 받아옴
+      setMessages((prev) => [...prev, ...newMessages]);     // ✅ USER, BOT 둘 다 append
       setInput("");
     } catch (err) {
       console.error("메시지 전송 실패", err);
-      alert("메시지 전송에 실패했습니다.");
     }
   };
 
@@ -65,18 +56,14 @@ export default function ChatRoom() {
         <h2 className="text-xl font-bold mb-4 text-center">채팅방 {roomId}</h2>
 
         <div className="bg-white p-4 rounded-lg shadow-md h-[60vh] overflow-y-auto mb-4">
-          {messages.map((msg) => (
+          {messages.map((msg, index) => (
             <div
-              key={msg.messageId || msg.id}
-              className={`mb-2 ${
-                msg.sender === "USER" ? "text-right" : "text-left"
-              }`}
+              key={msg.messageId || msg.id || index}
+              className={`mb-2 ${msg.sender === "USER" ? "text-right" : "text-left"}`}
             >
               <span
                 className={`inline-block px-4 py-2 rounded-lg ${
-                  msg.sender === "USER"
-                    ? "bg-blue-200 text-black"
-                    : "bg-gray-300 text-black"
+                  msg.sender === "USER" ? "bg-blue-200" : "bg-gray-300"
                 }`}
               >
                 {msg.content}

@@ -1,5 +1,7 @@
 package com.basic.myspringboot.chat.controller;
 
+import java.util.List;
+
 import com.basic.myspringboot.auth.security.UserPrincipal;
 import com.basic.myspringboot.chat.dto.*;
 import com.basic.myspringboot.chat.entity.ChatMessage;
@@ -34,26 +36,35 @@ public class ChatController {
 
     @Operation(summary = "채팅 메시지 전송", description = "사용자의 메시지를 저장하고 GPT 응답을 생성합니다.")
     @PostMapping("/chat")
-    public ResponseEntity<ApiResponse<ChatMessageResponse>> sendMessage(
+    public ResponseEntity<ApiResponse<List<ChatMessageResponse>>> sendMessage(
             @RequestBody ChatMessageRequest request,
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
 
-        ChatMessage message = chatService.saveMessage(
+        List<ChatMessage> messages = chatService.saveUserAndBotMessage(
                 request.getSessionId(),
-                request.getSender(),
                 request.getContent(),
-                userPrincipal  // 새로 추가
+                userPrincipal
         );
 
-        ChatMessageResponse response = ChatMessageResponse.builder()
-                .messageId(message.getId())
-                .sender(message.getSender())
-                .content(message.getMessage())
-                .timestamp(message.getTimestamp())
-                .build();
+        List<ChatMessageResponse> responseList = messages.stream()
+                .map(m -> ChatMessageResponse.builder()
+                        .messageId(m.getId())
+                        .sender(m.getSender())
+                        .content(m.getMessage())
+                        .timestamp(m.getTimestamp())
+                        .build())
+                .toList();
 
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.ok(response, "메시지가 성공적으로 저장되었습니다."));
+                .body(ApiResponse.ok(responseList, "USER + BOT 메시지 반환"));
+    }
+
+    @Operation(summary = "채팅 세션 목록 조회", description = "현재 로그인된 사용자의 채팅 세션 목록을 조회합니다.")
+    @GetMapping("/chat/sessions")
+    public ResponseEntity<ApiResponse<List<ChatSession>>> getSessions(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        Long userId = userPrincipal.getId();
+        List<ChatSession> sessions = chatService.getSessionsByUserId(userId);
+        return ResponseEntity.ok(ApiResponse.ok(sessions, "채팅 세션 목록 조회 성공"));
     }
 
     @Operation(summary = "채팅 히스토리 조회", description = "현재 로그인된 사용자의 AI 채팅 히스토리를 조회합니다.")

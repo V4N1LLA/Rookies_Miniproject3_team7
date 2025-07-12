@@ -150,6 +150,10 @@ public class ChatService {
         return chatbotClient.getVector(query);
     }
 
+    public List<ChatSession> getSessionsByUserId(Long userId) {
+        return chatSessionRepository.findAllByUserId(userId);
+    }
+
     public Feedback getFeedbackByUserId(Long userId) {
         return feedbackRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("Feedback not found"));
@@ -158,5 +162,29 @@ public class ChatService {
     public Feedback getFeedbackForVectorSearch(Long chatMessageId) {
         return feedbackRepository.findByChatMessage_Id(chatMessageId)
                 .orElseThrow(() -> new RuntimeException("Feedback not found"));
+    }
+
+    public List<ChatMessage> saveUserAndBotMessage(Long sessionId, String content, UserPrincipal userPrincipal) {
+        ChatSession session = chatSessionRepository.findById(sessionId)
+                .orElseThrow(() -> new IllegalArgumentException("Session not found"));
+
+        ChatMessage userMessage = ChatMessage.builder()
+                .chatSession(session)
+                .sender("USER")
+                .content(content)
+                .build();
+        ChatMessage savedUser = chatMessageRepository.save(userMessage);
+        session.addMessage(savedUser);
+
+        String botReply = generateBotResponse(content);
+        ChatMessage botMessage = ChatMessage.builder()
+                .chatSession(session)
+                .sender("BOT")
+                .content(botReply)
+                .build();
+        ChatMessage savedBot = chatMessageRepository.save(botMessage);
+        session.addMessage(savedBot);
+
+        return List.of(savedUser, savedBot);
     }
 }
