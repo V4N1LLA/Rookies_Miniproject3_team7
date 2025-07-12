@@ -61,6 +61,7 @@ services:
     networks:
       - app-network
 volumes:
+  db_data:
   faiss_volume:
   
 networks:

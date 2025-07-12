@@ -6,6 +6,8 @@ import com.basic.myspringboot.diary.DuplicateDiaryException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import com.basic.myspringboot.auth.security.UserPrincipal;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.*;
+import io.swagger.v3.oas.annotations.responses.*;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
@@ -13,12 +15,14 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.ZonedDateTime;
-import java.util.Map;
+import java.util.LinkedHashMap;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/diaries")
 @RequiredArgsConstructor
-@Tag(name = "다이어리", description = "일기 CRUD API")
+@Tag(name = "다이어리", description = "일기 작성 및 감정 분석 API")
 public class DiaryController {
 
     private final DiaryService diaryService;
@@ -68,18 +72,31 @@ public class DiaryController {
         data.put("timestamp", diary.getTimestamp());
 
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(body(DiaryDto.from(d), "일기가 등록되었습니다.", true));
+                .body(buildResponse(data, "일기가 등록되었습니다.", true));
+
     }
 
     /* 단건 */
     @GetMapping("/{id}")
-    @Operation(summary = "다이어리 상세 조회")
-    public ResponseEntity<?> detail(@PathVariable Long id,
-                                    @AuthenticationPrincipal UserPrincipal p) {
-        Diary d = diaryService.getDiary(id, p.getUser());
-        return ResponseEntity.ok(body(DiaryDto.from(d), "다이어리 조회 성공", true));
-    }
+    @Operation(summary = "일기 단건 조회", description = "ID를 기반으로 특정 일기를 조회합니다.")
+    public ResponseEntity<Map<String, Object>> getDiaryById(@PathVariable Long id) {
+        Diary diary = diaryService.getDiaryById(id);
 
+        Map<String, Object> data = new LinkedHashMap<>();
+        data.put("diaryId", diary.getDiaryId());
+        data.put("title", diary.getTitle());
+        data.put("content", diary.getContent());
+        data.put("timestamp", diary.getTimestamp());
+
+        if (diary.getAnalysisResult() != null) {
+            Map<String, Object> analysisMap = new LinkedHashMap<>();
+            analysisMap.put("domainEmotion", diary.getAnalysisResult().getDomainEmotion());
+            analysisMap.put("dim", diary.getAnalysisResult().getDim());
+            data.put("analysisResult", analysisMap);
+        }
+
+        return ResponseEntity.ok(buildResponse(data, "다이어리 조회 성공", true));
+    }
     /* 삭제 */
     @DeleteMapping("/{id}")
     @Operation(summary = "일기 삭제", description = "ID를 기반으로 일기를 삭제합니다.")
