@@ -10,7 +10,7 @@ const getAuthHeader = () => ({
 // 채팅방 목록
 export const fetchChatRooms = async () => {
   try {
-    const response = await axios.get(`${API_CHAT_BASE_URL}/rooms`, {
+    const response = await axios.get(`${API_CHAT_BASE_URL}/chat/sessions`, {
       headers: getAuthHeader(),
     });
     return response.data.data;
@@ -20,9 +20,9 @@ export const fetchChatRooms = async () => {
 };
 
 // 메시지 목록
-export const fetchChatMessages = async (roomId) => {
+export const fetchChatMessages = async (sessionId) => {
   try {
-    const response = await axios.get(`${API_CHAT_BASE_URL}/rooms/${roomId}/messages`, {
+    const response = await axios.get(`${API_CHAT_BASE_URL}/chat/messages?sessionId=${sessionId}`, {
       headers: getAuthHeader(),
     });
     return response.data.data;
@@ -35,8 +35,12 @@ export const fetchChatMessages = async (roomId) => {
 export const sendMessage = async (roomId, message) => {
   try {
     const response = await axios.post(
-      `${API_CHAT_BASE_URL}/rooms/${roomId}/messages`,
-      { message },
+      `${API_CHAT_BASE_URL}/chat`,
+      {
+        sessionId: parseInt(roomId),
+        sender: "USER",
+        content: message,
+      },
       { headers: getAuthHeader() }
     );
     return response.data.data;

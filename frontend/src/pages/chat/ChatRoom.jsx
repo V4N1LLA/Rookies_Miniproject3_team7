@@ -17,6 +17,7 @@ export default function ChatRoom() {
         setMessages(data);
       } catch (err) {
         console.error("채팅 메시지 불러오기 실패", err);
+        alert("채팅 메시지를 불러오는 데 실패했습니다.");
       }
     };
     loadMessages();
@@ -26,25 +27,33 @@ export default function ChatRoom() {
     e.preventDefault();
     if (!input.trim()) return;
 
+    // Optimistic UI
+    const tempMessage = {
+      id: Date.now(),
+      sender: "USER",
+      content: input,
+    };
+    setMessages((prev) => [...prev, tempMessage]);
+
     try {
       const newMsg = await sendMessage(roomId, input);
       setMessages((prev) => [...prev, newMsg]);
       setInput("");
     } catch (err) {
       console.error("메시지 전송 실패", err);
+      alert("메시지 전송에 실패했습니다.");
     }
   };
 
   return (
     <div className="min-h-screen bg-white relative flex justify-center items-center font-['SejongGeulggot']">
-      {/* 배경 원 (고정 위치, 고정 색상, 애니메이션 없음) */}
+      {/* 배경 원 */}
       <div className="absolute top-0 left-0 w-full h-full pointer-events-none z-0">
         <div className="absolute w-24 h-24 bg-pink-200 opacity-40 rounded-full top-[10%] left-[15%]" />
         <div className="absolute w-16 h-16 bg-blue-200 opacity-30 rounded-full top-[50%] left-[60%]" />
         <div className="absolute w-20 h-20 bg-yellow-200 opacity-30 rounded-full top-[80%] left-[25%]" />
       </div>
 
-      {/* 채팅 UI */}
       <div className="z-10 bg-[#f8f8f8] rounded-3xl shadow-2xl p-8 w-[650px] border border-gray-300">
         <button
           onClick={() => navigate("/chat")}
@@ -58,7 +67,7 @@ export default function ChatRoom() {
         <div className="bg-white p-4 rounded-lg shadow-md h-[60vh] overflow-y-auto mb-4">
           {messages.map((msg) => (
             <div
-              key={msg.id}
+              key={msg.messageId || msg.id}
               className={`mb-2 ${
                 msg.sender === "USER" ? "text-right" : "text-left"
               }`}
@@ -70,7 +79,7 @@ export default function ChatRoom() {
                     : "bg-gray-300 text-black"
                 }`}
               >
-                {msg.text}
+                {msg.content}
               </span>
             </div>
           ))}
