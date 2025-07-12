@@ -22,7 +22,7 @@ function MainPage() {
   };
 
   return (
-    <div className="h-screen flex flex-col items-center justify-center text-white font-erica">
+    <div className="min-h-screen flex flex-col items-center justify-center text-white font-erica">
       {!showStartButton ? (
         <>
           <h1

@@ -67,7 +67,7 @@ function DiaryWrite() {
   };
 
   return (
-    <div className="min-h-screen flex justify-center items-center py-12 px-4">
+    <div className="min-h-screen flex justify-center items-start py-12 px-4">
       <div className="w-full bg-paper max-w-5xl bg-white/70 shadow-md rounded-xl p-10">
         {/* 날짜 및 날씨 선택 영역 */}
         <div className="flex items-center justify-center gap-20 mb-6">
