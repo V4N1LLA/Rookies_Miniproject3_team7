@@ -21,8 +21,16 @@ import lombok.RequiredArgsConstructor;
 import java.util.function.LongFunction;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.JsonNode;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +43,11 @@ public class ChatService {
     private final ChatbotClient chatbotClient;
     private final VectorDbClient vectorDbClient;
     private final LangServeClient langServeClient;
+    private final RestTemplate restTemplate;
+    private final ObjectMapper objectMapper;
+
+    @Value("${openai.api.key}")
+    private String openAiApiKey;
 
     public ChatSession createSession() {
         ChatSession session = ChatSession.builder().build();
@@ -50,19 +63,56 @@ public class ChatService {
         ChatSession session = chatSessionRepository.findById(sessionId)
                 .orElseThrow(() -> new IllegalArgumentException("Session not found"));
 
-        ChatMessage message = ChatMessage.builder()
+        // 1. 사용자 메시지 저장
+        ChatMessage userMessage = ChatMessage.builder()
                 .chatSession(session)
                 .sender(sender)
                 .content(content)
                 .build();
 
-        ChatMessage saved = chatMessageRepository.save(message);
-        session.addMessage(saved);
+        ChatMessage savedUser = chatMessageRepository.save(userMessage);
+        session.addMessage(savedUser);
 
-        // ✅ Vector DB 저장 예시 코드
-        vectorDbClient.saveEmbedding(saved.getId(), content, 1536, "neutral", jwtToken);
+        // 2. GPT 응답 생성 및 저장
+        try {
+            String botReply = generateBotResponse(content);  // GPT 응답 생성
 
-        return saved;
+            ChatMessage botMessage = ChatMessage.builder()
+                    .chatSession(session)
+                    .sender("BOT")  // 👈 반드시 "BOT" 으로 저장
+                    .content(botReply)
+                    .build();
+
+            chatMessageRepository.save(botMessage);
+            session.addMessage(botMessage);
+
+        } catch (Exception e) {
+            throw new RuntimeException("GPT 응답 생성 실패", e);
+        }
+
+        // 3. Embedding 저장
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.setBearerAuth(openAiApiKey);
+
+            Map<String, Object> body = new HashMap<>();
+            body.put("input", content);
+            body.put("model", "text-embedding-ada-002");
+
+            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
+            ResponseEntity<String> response = restTemplate.postForEntity("https://api.openai.com/v1/embeddings", entity, String.class);
+
+            JsonNode jsonNode = objectMapper.readTree(response.getBody());
+            JsonNode embeddingNode = jsonNode.get("data").get(0).get("embedding");
+            String embeddingJson = objectMapper.writeValueAsString(embeddingNode);
+
+            vectorDbClient.saveEmbedding(savedUser.getId(), embeddingJson, 1536, "neutral", jwtToken);
+        } catch (Exception e) {
+            throw new RuntimeException("Embedding 생성 실패", e);
+        }
+
+        return savedUser;
     }
 
     public Feedback saveFeedback(Long messageId, String feedbackStr) {
@@ -100,22 +150,19 @@ public class ChatService {
     }
 
     public String generateBotResponse(String prompt) {
-        // ✅ LangServeClient 예시 호출 코드
         return langServeClient.getAIResponse(prompt);
     }
+
     public ChatVectorResponse searchVector(String query) {
         return chatbotClient.getVector(query);
     }
+
     public Feedback getFeedbackByUserId(Long userId) {
-        // userId 기반으로 Feedback 조회 로직 작성
-        // 예시: repository.findByUserId(userId).orElseThrow(...)
         return feedbackRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("Feedback not found"));
     }
 
     public Feedback getFeedbackForVectorSearch(Long chatMessageId) {
-        // Vector search query에 해당하는 feedback 조회 로직 예시
-        // 실제로는 벡터 검색 결과와 매핑된 Feedback을 반환하도록 구현
         return feedbackRepository.findByChatMessage_Id(chatMessageId)
                 .orElseThrow(() -> new RuntimeException("Feedback not found"));
     }
