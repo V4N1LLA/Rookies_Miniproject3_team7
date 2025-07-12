@@ -80,6 +80,16 @@ export default function Signup() {
             회원가입
           </button>
         </form>
+        {/* 로그인 돌아가기 링크 */}
+        <p className="mt-6 text-sm text-center text-gray-600">
+          계정이 있으신가요?{" "}
+          <span
+            className="text-blue-600 font-semibold underline cursor-pointer"
+            onClick={() => navigate("/login")}
+          >
+            로그인
+          </span>
+        </p>
       </div>
     </div>
   );
