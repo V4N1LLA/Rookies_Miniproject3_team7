@@ -93,7 +93,7 @@ public class ChatController {
         );
     }
 
-    @GetMapping("/sessions")
+    @GetMapping("/chat/sessions")
     public ResponseEntity<ApiResponse<List<ChatSessionResponse>>> getChatSessions(@RequestParam Long userId) {
         List<ChatSessionResponse> responses = chatService.getChatSessionsByUserId(userId);
         return ResponseEntity.ok(ApiResponse.success(responses));

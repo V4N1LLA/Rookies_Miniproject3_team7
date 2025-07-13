@@ -61,6 +61,7 @@ com\basic\myspringboot\chat\entity\ChatMessage$ChatMessageBuilder.class
 com\basic\myspringboot\chat\dto\ChatVectorResponse$ChatVectorResponseBuilder.class
 com\basic\myspringboot\analysis\entity\EmotionAnalysisResult.class
 com\basic\myspringboot\analysis\entity\EmotionScore$EmotionScoreBuilder.class
+com\basic\myspringboot\chat\dto\ChatSessionResponse.class
 com\basic\myspringboot\analysis\service\EmotionScoreService.class
 com\basic\myspringboot\analysis\entity\EmotionAnalysisResult$EmotionAnalysisResultBuilder.class
 com\basic\myspringboot\config\RestTemplateConfig.class
@@ -73,6 +74,7 @@ com\basic\myspringboot\chat\repository\ChatMessageRepository.class
 com\basic\myspringboot\diary\DiaryController.class
 com\basic\myspringboot\analysis\dto\EmotionRequestDto.class
 com\basic\myspringboot\common\ApiResponse$ApiResponseBuilder.class
+com\basic\myspringboot\chat\dto\ChatSessionResponse$ChatSessionResponseBuilder.class
 com\basic\myspringboot\chat\dto\FeedbackRequest$FeedbackRequestBuilder.class
 com\basic\myspringboot\chat\repository\ChatSessionRepository.class
 com\basic\myspringboot\analysis\dto\EmotionScoreDto.class

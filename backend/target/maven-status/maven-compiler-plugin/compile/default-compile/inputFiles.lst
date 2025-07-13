@@ -38,6 +38,7 @@ C:\mybackend\Rookies_Miniproject3_team7\backend\src\main\java\com\basic\myspring
 C:\mybackend\Rookies_Miniproject3_team7\backend\src\main\java\com\basic\myspringboot\chat\dto\ChatHistoryResponse.java
 C:\mybackend\Rookies_Miniproject3_team7\backend\src\main\java\com\basic\myspringboot\chat\dto\ChatMessageRequest.java
 C:\mybackend\Rookies_Miniproject3_team7\backend\src\main\java\com\basic\myspringboot\chat\dto\ChatMessageResponse.java
+C:\mybackend\Rookies_Miniproject3_team7\backend\src\main\java\com\basic\myspringboot\chat\dto\ChatSessionResponse.java
 C:\mybackend\Rookies_Miniproject3_team7\backend\src\main\java\com\basic\myspringboot\chat\dto\ChatVectorResponse.java
 C:\mybackend\Rookies_Miniproject3_team7\backend\src\main\java\com\basic\myspringboot\chat\dto\FeedbackRequest.java
 C:\mybackend\Rookies_Miniproject3_team7\backend\src\main\java\com\basic\myspringboot\chat\entity\ChatMessage.java
