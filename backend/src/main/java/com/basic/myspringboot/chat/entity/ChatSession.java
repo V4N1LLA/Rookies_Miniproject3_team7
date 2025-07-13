@@ -1,5 +1,6 @@
 package com.basic.myspringboot.chat.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,7 +27,9 @@ public class ChatSession {
     private LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "chatSession", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonManagedReference
     private List<ChatMessage> messages = new ArrayList<>();
+
 
     @PrePersist
     public void prePersist() {

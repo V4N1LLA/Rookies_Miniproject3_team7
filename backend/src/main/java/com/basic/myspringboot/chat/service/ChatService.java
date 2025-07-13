@@ -1,7 +1,5 @@
 package com.basic.myspringboot.chat.service;
 
-import java.util.List;
-
 import com.basic.myspringboot.chat.client.ChatbotClient;
 import com.basic.myspringboot.chat.client.LangServeClient;
 import com.basic.myspringboot.chat.client.VectorDbClient;
@@ -13,16 +11,21 @@ import com.basic.myspringboot.chat.entity.Feedback;
 import com.basic.myspringboot.chat.repository.ChatMessageRepository;
 import com.basic.myspringboot.chat.repository.ChatSessionRepository;
 import com.basic.myspringboot.chat.repository.FeedbackRepository;
+import com.basic.myspringboot.auth.security.UserPrincipal;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.persistence.EntityNotFoundException;
-
 import lombok.RequiredArgsConstructor;
-
-import java.util.function.LongFunction;
-import java.util.stream.Collectors;
-
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -35,34 +38,73 @@ public class ChatService {
     private final ChatbotClient chatbotClient;
     private final VectorDbClient vectorDbClient;
     private final LangServeClient langServeClient;
+    private final RestTemplate restTemplate;
+    private final ObjectMapper objectMapper;
 
-    public ChatSession createSession() {
-        ChatSession session = ChatSession.builder().build();
+    @Value("${openai.api.key}")
+    private String openAiApiKey;
+
+    public ChatSession createSession(UserPrincipal userPrincipal) {
+        Long userId = userPrincipal.getId();
+        ChatSession session = ChatSession.builder()
+                .userId(userId)
+                .build();
         return chatSessionRepository.save(session);
     }
 
-    public ChatSession getSessionById(Long id) {
-        return chatSessionRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Session not found with id: " + id));
-    }
-
-    public ChatMessage saveMessage(Long sessionId, String sender, String content, String jwtToken) {
+    public ChatMessage saveMessage(Long sessionId, String sender, String content, UserPrincipal userPrincipal) {
         ChatSession session = chatSessionRepository.findById(sessionId)
                 .orElseThrow(() -> new IllegalArgumentException("Session not found"));
 
-        ChatMessage message = ChatMessage.builder()
+        ChatMessage userMessage = ChatMessage.builder()
                 .chatSession(session)
-                .sender(sender)
+                .sender("USER")
                 .content(content)
                 .build();
 
-        ChatMessage saved = chatMessageRepository.save(message);
-        session.addMessage(saved);
+        ChatMessage savedUser = chatMessageRepository.save(userMessage);
+        session.addMessage(savedUser);
 
-        // ✅ Vector DB 저장 예시 코드
-        vectorDbClient.saveEmbedding(saved.getId(), content, 1536, "neutral", jwtToken);
+        try {
+            String botReply = generateBotResponse(content);
 
-        return saved;
+            ChatMessage botMessage = ChatMessage.builder()
+                    .chatSession(session)
+                    .sender("BOT")
+                    .content(botReply)
+                    .build();
+
+            chatMessageRepository.save(botMessage);
+            session.addMessage(botMessage);
+
+        } catch (Exception e) {
+            throw new RuntimeException("GPT 응답 생성 실패", e);
+        }
+
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.setBearerAuth(openAiApiKey);
+
+            Map<String, Object> body = new HashMap<>();
+            body.put("input", content);
+            body.put("model", "text-embedding-ada-002");
+
+            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
+            ResponseEntity<String> response = restTemplate.postForEntity(
+                    "https://api.openai.com/v1/embeddings", entity, String.class);
+
+            JsonNode jsonNode = objectMapper.readTree(response.getBody());
+            JsonNode embeddingNode = jsonNode.get("data").get(0).get("embedding");
+            String embeddingJson = objectMapper.writeValueAsString(embeddingNode);
+
+            vectorDbClient.saveEmbedding(savedUser.getId(), embeddingJson, 1536, "neutral");
+
+        } catch (Exception e) {
+            throw new RuntimeException("Embedding 생성 실패", e);
+        }
+
+        return savedUser;
     }
 
     public Feedback saveFeedback(Long messageId, String feedbackStr) {
@@ -83,41 +125,79 @@ public class ChatService {
         ChatSession session = chatSessionRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Session not found for userId: " + userId));
 
-        List<ChatHistoryResponse.ChatHistoryItem> historyItems = chatMessageRepository
-                .findByChatSessionId(session.getId())
-                .stream()
-                .map(message -> ChatHistoryResponse.ChatHistoryItem.builder()
-                        .userMessage(message.getSender().equals("user") ? message.getContent() : "")
-                        .aiResponse(message.getSender().equals("ai") ? message.getContent() : "")
-                        .timestamp(message.getCreatedAt().toString())
-                        .build())
-                .collect(Collectors.toList());
+        List<ChatMessage> messages = chatMessageRepository.findByChatSessionIdOrderByCreatedAtAsc(session.getId());
+
+        List<ChatHistoryResponse.ChatHistoryItem> history = new ArrayList<>();
+
+        for (int i = 0; i < messages.size() - 1; i++) {
+            ChatMessage userMsg = messages.get(i);
+            ChatMessage botMsg = messages.get(i + 1);
+
+            // USER → BOT 순서일 경우에만 묶기
+            if ("USER".equalsIgnoreCase(userMsg.getSender()) && "BOT".equalsIgnoreCase(botMsg.getSender())) {
+                history.add(ChatHistoryResponse.ChatHistoryItem.builder()
+                        .userMessage(userMsg.getContent())
+                        .aiResponse(botMsg.getContent())
+                        .timestamp(userMsg.getCreatedAt().toString())  // 또는 format 지정
+                        .feedback(userMsg.getFeedback() != null ? userMsg.getFeedback().getFeedback() : null)
+                        .build());
+                i++; // BOT 메시지 건너뛰기
+            }
+        }
 
         return ChatHistoryResponse.builder()
                 .userId(userId)
-                .history(historyItems)
+                .history(history)
                 .build();
     }
 
     public String generateBotResponse(String prompt) {
-        // ✅ LangServeClient 예시 호출 코드
         return langServeClient.getAIResponse(prompt);
     }
+
     public ChatVectorResponse searchVector(String query) {
         return chatbotClient.getVector(query);
     }
+
+    public List<ChatSession> getSessionsByUserId(Long userId) {
+        return chatSessionRepository.findAllByUserId(userId);
+    }
+
     public Feedback getFeedbackByUserId(Long userId) {
-        // userId 기반으로 Feedback 조회 로직 작성
-        // 예시: repository.findByUserId(userId).orElseThrow(...)
         return feedbackRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("Feedback not found"));
     }
 
     public Feedback getFeedbackForVectorSearch(Long chatMessageId) {
-        // Vector search query에 해당하는 feedback 조회 로직 예시
-        // 실제로는 벡터 검색 결과와 매핑된 Feedback을 반환하도록 구현
         return feedbackRepository.findByChatMessage_Id(chatMessageId)
                 .orElseThrow(() -> new RuntimeException("Feedback not found"));
     }
 
+    public List<ChatMessage> getMessagesBySessionId(Long sessionId) {
+        return chatMessageRepository.findByChatSessionId(sessionId);
+    }
+
+    public List<ChatMessage> saveUserAndBotMessage(Long sessionId, String content, UserPrincipal userPrincipal) {
+        ChatSession session = chatSessionRepository.findById(sessionId)
+                .orElseThrow(() -> new IllegalArgumentException("Session not found"));
+
+        ChatMessage userMessage = ChatMessage.builder()
+                .chatSession(session)
+                .sender("USER")
+                .content(content)
+                .build();
+        ChatMessage savedUser = chatMessageRepository.save(userMessage);
+        session.addMessage(savedUser);
+
+        String botReply = generateBotResponse(content);
+        ChatMessage botMessage = ChatMessage.builder()
+                .chatSession(session)
+                .sender("BOT")
+                .content(botReply)
+                .build();
+        ChatMessage savedBot = chatMessageRepository.save(botMessage);
+        session.addMessage(savedBot);
+
+        return List.of(savedUser, savedBot);
+    }
 }

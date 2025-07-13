@@ -1,5 +1,6 @@
 package com.basic.myspringboot.chat.dto;
 
+import com.basic.myspringboot.chat.entity.ChatMessage;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -14,4 +15,13 @@ public class ChatMessageResponse {
     private String sender;
     private String content;
     private LocalDateTime timestamp;
+
+    public ChatMessageResponse(ChatMessage message) {
+        this.messageId = message.getId();
+        this.sender = message.getIsUser() ? "user" : "system";
+        this.content = message.getContent();
+        this.timestamp = message.getCreatedAt();
+    }
+
 }
+

@@ -32,7 +32,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         return (HttpServletRequest req) -> {
             CorsConfiguration cfg = new CorsConfiguration();
-            cfg.setAllowedOrigins(List.of("http://localhost:3000", "http://3.35.14.160:3000"));          // 와일드카드 패턴 + 프론트 배포 주소 명시
+            cfg.setAllowedOrigins(List.of("http://localhost:3000", "http://43.203.198.152:3000"));          // 와일드카드 패턴 + 프론트 배포 주소 명시
             cfg.setAllowedMethods(List.of("GET","POST","PUT","DELETE","OPTIONS"));
             cfg.setAllowedHeaders(List.of("*"));
             cfg.setAllowCredentials(true);                       // 쿠키/Authorization 헤더 둘 다 허용
@@ -62,13 +62,18 @@ public class SecurityConfig {
             .and()
                 .authorizeHttpRequests()
                 .requestMatchers(
-                        "/api/auth/**",
-                        "/v3/api-docs/**",
+                        "/api/auth/**",           // 로그인, 회원가입
+                        "/v3/api-docs/**",        // Swagger
                         "/swagger-ui/**",
                         "/swagger-ui.html",
-                        "/api/analysis/**"
+                        "/api/analysis/**",       // 공개 분석 API
+                        "/ai/test",                // 예외적으로 공개 허용할 URI만 명시
+                        "/ai/chat/messages"
                 ).permitAll()
-                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
+                .requestMatchers("/ai/chat/**").authenticated() // ✅ AI 채팅 관련은 인증 필요
+
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // 프리플라이트 CORS
                 .anyRequest().authenticated()
             .and()
             .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);

@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> {
     List<ChatMessage> findByChatSessionId(Long sessionId);
+    List<ChatMessage> findByChatSessionIdOrderByCreatedAtAsc(Long sessionId);
 }

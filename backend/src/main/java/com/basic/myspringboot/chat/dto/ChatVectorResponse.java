@@ -8,5 +8,5 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class ChatVectorResponse {
-    private String result; // ✅ FastAPI 응답 필드명에 맞게 수정
+    private String result; // FastAPI 응답이 { "result": "..." } 형태일 때
 }

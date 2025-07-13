@@ -1,6 +1,5 @@
 package com.basic.myspringboot.diary;
 
-import com.basic.myspringboot.auth.entity.User;
 import java.util.List;
 
 public interface DiaryService {
