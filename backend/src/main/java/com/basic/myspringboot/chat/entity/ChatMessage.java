@@ -1,5 +1,6 @@
 package com.basic.myspringboot.chat.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
@@ -18,7 +19,9 @@ public class ChatMessage {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chat_session_id")
+    @JsonManagedReference
     private ChatSession chatSession;
+
 
     private String sender; // USER or BOT
 
