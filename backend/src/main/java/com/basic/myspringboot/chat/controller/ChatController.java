@@ -61,10 +61,18 @@ public class ChatController {
 
     @Operation(summary = "채팅 세션 목록 조회", description = "현재 로그인된 사용자의 채팅 세션 목록을 조회합니다.")
     @GetMapping("/chat/sessions")
-    public ResponseEntity<ApiResponse<List<ChatSession>>> getSessions(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+    public ResponseEntity<ApiResponse<List<ChatSessionResponse>>> getSessions(@AuthenticationPrincipal UserPrincipal userPrincipal) {
         Long userId = userPrincipal.getId();
         List<ChatSession> sessions = chatService.getSessionsByUserId(userId);
-        return ResponseEntity.ok(ApiResponse.ok(sessions, "채팅 세션 목록 조회 성공"));
+
+        List<ChatSessionResponse> responseList = sessions.stream()
+                .map(session -> ChatSessionResponse.builder()
+                        .sessionId(session.getId())
+                        .createdAt(session.getCreatedAt())
+                        .build())
+                .toList();
+
+        return ResponseEntity.ok(ApiResponse.ok(responseList, "채팅 세션 목록 조회 성공"));
     }
 
     @Operation(summary = "채팅 메시지 목록 조회", description = "해당 세션 ID에 속한 메시지들을 조회합니다.")

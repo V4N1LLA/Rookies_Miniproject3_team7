@@ -12,6 +12,7 @@ export default function ChatRoomList() {
       try {
         const data = await fetchChatRooms();
         setRooms(data);
+        console.log("채팅방 목록 불러오기 성공:", data);
       } catch (err) {
         console.error("채팅방 불러오기 실패", err);
         alert("채팅방 목록을 불러오는 데 실패했습니다.");
@@ -49,7 +50,9 @@ export default function ChatRoomList() {
           </button>
         </div>
         {loading ? (
-          <div className="text-center text-gray-500">채팅방 목록을 불러오는 중...</div>
+          <div className="text-center text-gray-500">
+            채팅방 목록을 불러오는 중...
+          </div>
         ) : (
           <ul className="space-y-4">
             {rooms.map((room) => (
@@ -58,13 +61,11 @@ export default function ChatRoomList() {
                   to={`/chat/${room.id}`}
                   className="block w-full text-center p-4 bg-white rounded-xl shadow hover:bg-yellow-100 transition border border-gray-200"
                 >
-         {`💬 ${new Date(room.createdAt).toLocaleString("ko-KR", {
-           year: "numeric",
-           month: "2-digit",
-           day: "2-digit",
-           hour: "2-digit",
-           minute: "2-digit"
-         })} 에 생성한 대화`}
+                  {`💬 ${new Date(room.createdAt).toLocaleString("ko-KR", {
+                    year: "numeric",
+                    month: "2-digit",
+                    day: "2-digit",
+                  })} 에 생성한 대화`}
                 </Link>
               </li>
             ))}
