@@ -56,9 +56,9 @@ export default function ChatRoomList() {
         ) : (
           <ul className="space-y-4">
             {rooms.map((room) => (
-              <li key={room.id}>
+              <li key={room.sessionId}>
                 <Link
-                  to={`/chat/${room.id}`}
+                  to={`/chat/${room.sessionId}`}
                   className="block w-full text-center p-4 bg-white rounded-xl shadow hover:bg-yellow-100 transition border border-gray-200"
                 >
                   {`💬 ${new Date(room.createdAt).toLocaleString("ko-KR", {
