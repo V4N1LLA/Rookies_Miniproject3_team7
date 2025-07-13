@@ -1,6 +1,51 @@
+# =============== Java & Maven ===============
+/target/
+*.class
+*.jar
+*.jar.original
+*.war
+*.log
+
+# =============== 환경설정 파일 ===============
 .env
-/backend/target/
-/backend/target/MySpringBootApp-0.0.1-SNAPSHOT.jar
-frontend/dist
-.vscode
-.idea
+application-local.yml
+
+# =============== IDE 설정 무시 ===============
+
+# STS (Spring Tool Suite)
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings/
+.springBeans
+.sts4-cache
+
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# VS Code
+.vscode/
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# =============== 빌드 디렉토리 ===============
+build/
+
+# =============== 운영체제 파일 ===============
+.DS_Store
+Thumbs.db
+
+# =============== Python ===============
+python-emotion-api/venv/
+python-emotion-api/.venv/
+__pycache__/
+*.pyc

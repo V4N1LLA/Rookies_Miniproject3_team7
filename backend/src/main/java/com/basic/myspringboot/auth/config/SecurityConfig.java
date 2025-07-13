@@ -62,14 +62,18 @@ public class SecurityConfig {
             .and()
                 .authorizeHttpRequests()
                 .requestMatchers(
-                        "/api/auth/**",
-                        "/v3/api-docs/**",
+                        "/api/auth/**",           // 로그인, 회원가입
+                        "/v3/api-docs/**",        // Swagger
                         "/swagger-ui/**",
                         "/swagger-ui.html",
-                        "/api/analysis/**",
-                        "/ai/**"
+                        "/api/analysis/**",       // 공개 분석 API
+                        "/ai/test",                // 예외적으로 공개 허용할 URI만 명시
+                        "/ai/chat/messages"
                 ).permitAll()
-                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
+                .requestMatchers("/ai/chat/**").authenticated() // ✅ AI 채팅 관련은 인증 필요
+
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // 프리플라이트 CORS
                 .anyRequest().authenticated()
             .and()
             .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
