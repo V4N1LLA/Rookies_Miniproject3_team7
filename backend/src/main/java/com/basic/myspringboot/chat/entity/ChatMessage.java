@@ -25,6 +25,9 @@ public class ChatMessage {
     @Column(columnDefinition = "TEXT")
     private String content;
 
+    private Boolean isUser;
+
+
     private LocalDateTime createdAt;
 
     @OneToOne(mappedBy = "chatMessage", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
