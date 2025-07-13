@@ -9,6 +9,7 @@ export default function ChatRoom() {
 
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const loadMessages = async () => {
@@ -28,18 +29,28 @@ export default function ChatRoom() {
     e.preventDefault();
     if (!input.trim()) return;
 
+    const userMessage = {
+      content: input,
+      sender: "USER",
+    };
+
+    setMessages((prev) => [...prev, userMessage]);
+    setInput("");
+    setLoading(true);
+
     try {
-      const newMessages = await sendMessage(roomId, input); // ✅ 배열로 받아옴
+      const newMessages = await sendMessage(roomId, input);
       console.log("전송 후 새 메시지 목록:", newMessages);
-      setMessages((prev) => [...prev, ...newMessages]); // ✅ USER, BOT 둘 다 append
-      setInput("");
+      setMessages((prev) => [...prev.slice(0, -1), ...newMessages]);
     } catch (err) {
       console.error("메시지 전송 실패", err);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-white relative flex justify-center items-center font-['SejongGeulggot']">
+    <div className="bg-white relative flex justify-center items-center font-['SejongGeulggot']">
       {/* 배경 원 */}
       <div className="absolute top-0 left-0 w-full h-full pointer-events-none z-0">
         <div className="absolute w-24 h-24 bg-pink-200 opacity-40 rounded-full top-[10%] left-[15%]" />
@@ -55,7 +66,7 @@ export default function ChatRoom() {
           ← 채팅방 목록으로
         </button>
 
-        <h2 className="text-xl font-bold mb-4 text-center">채팅방 {roomId}</h2>
+        <h2 className="text-xl font-bold mb-4 text-center">채팅방</h2>
 
         <div className="bg-white p-4 rounded-lg shadow-md h-[60vh] overflow-y-auto mb-4">
           {messages.map((msg, index) => (
@@ -70,10 +81,18 @@ export default function ChatRoom() {
                   msg.sender === "USER" ? "bg-blue-200" : "bg-gray-300"
                 }`}
               >
-                {msg.content}
+                {msg.content.split("\n").map((line, idx) => (
+                  <React.Fragment key={idx}>
+                    {line}
+                    <br />
+                  </React.Fragment>
+                ))}
               </span>
             </div>
           ))}
+          {loading && (
+            <div className="text-center text-gray-500 italic mb-2">응답을 기다리는 중...</div>
+          )}
         </div>
 
         <form onSubmit={handleSend} className="flex gap-2">

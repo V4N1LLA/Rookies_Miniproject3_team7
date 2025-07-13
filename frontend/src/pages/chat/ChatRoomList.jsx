@@ -58,7 +58,13 @@ export default function ChatRoomList() {
                   to={`/chat/${room.id}`}
                   className="block w-full text-center p-4 bg-white rounded-xl shadow hover:bg-yellow-100 transition border border-gray-200"
                 >
-                  {room.name || `채팅방 ${room.id}`}
+         {`💬 ${new Date(room.createdAt).toLocaleString("ko-KR", {
+           year: "numeric",
+           month: "2-digit",
+           day: "2-digit",
+           hour: "2-digit",
+           minute: "2-digit"
+         })} 에 생성한 대화`}
                 </Link>
               </li>
             ))}
