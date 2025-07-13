@@ -1,5 +1,6 @@
 .env
 /backend/target/
+/backend/target/MySpringBootApp-0.0.1-SNAPSHOT.jar
 frontend/dist
 .vscode
 .idea
